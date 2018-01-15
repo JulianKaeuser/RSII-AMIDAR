@@ -1,0 +1,17 @@
+{
+"name" : "Interconnect_4pe_mesh",
+"Interconnection":
+	{
+	"0" : [0,1],
+	"1" : [1,0,3],
+	"2" : [2,0,3],
+	"3" : [3,2,1]
+	},
+"live_out" :
+	{
+	"0" : true,
+	"1" : true,
+	"2" : true,
+	"3" : true
+	}
+}
