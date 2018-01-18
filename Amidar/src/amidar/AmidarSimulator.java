@@ -35,7 +35,7 @@ import org.apache.bcel.generic.TargetLostException;
 
 import cgramodel.CgraModel;
 
-import com.sun.media.jfxmedia.events.NewFrameEvent;
+//import com.sun.media.jfxmedia.events.NewFrameEvent;
 import com.sun.org.apache.xerces.internal.impl.dv.xs.DecimalDV;
 
 import scheduler.RCListSched.AliasingSpeculation;
