@@ -1,6 +1,4 @@
-package gps.test;
-
-import gps.acquisition.Acquisition;
+package gps.acquisition;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedReader;
@@ -15,7 +13,12 @@ public class AcquisitionTest {
 
 		Acquisition acq = null;
 		
-		int testNr = 1;
+		
+		int testNr = 0;
+		while(testNr <1 || testNr >4) {
+
+			 testNr =  (int)Math.round(Math.random()*(4.0));
+		}
 		
 		String Nr = Integer.toString(testNr);
 		if(Nr.length() == 1){
@@ -29,16 +32,18 @@ public class AcquisitionTest {
 		boolean acquisition = false;
 		int freq = -1234;
 		int codeVersch = -1110;
+		int nrOfSamples = -1;
 
 		try{
 			FileInputStream frData = new FileInputStream(inputData);
 			BufferedInputStream brData = new BufferedInputStream(frData);
 			
-			int nrOfSamples;
+			
 			
 			String line = readLine(brData);
 			nrOfSamples = Integer.parseInt(line);
 			acq = new Acquisition(nrOfSamples);
+			
 			
 			for(int i = 0; i < nrOfSamples; i++){
 				line = readLine(brData);
@@ -47,6 +52,7 @@ public class AcquisitionTest {
 				float real = Float.parseFloat(values[0]);
 				float imag = Float.parseFloat(values[1]);
 				acq.enterSample(real, imag);
+				
 			}
 
 			brData.close();
@@ -68,6 +74,7 @@ public class AcquisitionTest {
 				float real = Float.parseFloat(values[0]);
 				float imag = Float.parseFloat(values[1]);
 				acq.enterCode(real, imag);
+				
 			}
 			
 			FileInputStream fsRes = new FileInputStream(results);
@@ -92,17 +99,18 @@ public class AcquisitionTest {
 		
 		boolean res = acq.startAcquisition();
 		
-		boolean passed = res == acquisition && acq.getCodeVerschiebung()== codeVersch && acq.getDopplerverschiebung() == freq;
-		System.out.println((passed?"PASSED":"FAILED") + " Test Nr. " + Nr);
-		if(!passed){
-			System.out.println("Epected " + acquisition + " acquistion");
-			System.out.println("    " + codeVersch);
-			System.out.println("    " + freq);
+		
+			boolean passed = res == acquisition && acq.getCodeVerschiebung()== codeVersch && acq.getDopplerverschiebung() == freq;
 			
-			System.out.println("Got " + res + " acquistion");
-			System.out.println("     " + acq.getCodeVerschiebung());
-			System.out.println("     " + acq.getDopplerverschiebung());
-		}
+
+		System.out.println("DFT/CONVO");
+		System.out.println((passed?"PASSED":"FAILED")+ " Test Nr. " + Nr);
+		
+			System.out.println("nrOfSamples: "+nrOfSamples);
+			System.out.println("Epected " + acquisition + " acquistion");
+			System.out.println("    codeShift:    " + codeVersch);
+			System.out.println("    dopplerShift: " + freq);
+		
 		
 
 
