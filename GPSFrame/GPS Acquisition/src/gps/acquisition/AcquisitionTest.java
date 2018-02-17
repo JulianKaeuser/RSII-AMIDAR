@@ -11,7 +11,7 @@ public class AcquisitionTest {
 	public static void main(String[] args) {
 		
 
-		Acquisition acq = null;
+		AcquisitionNoOpt acq = null;
 		
 		
 		int testNr = 0;
@@ -42,7 +42,7 @@ public class AcquisitionTest {
 			
 			String line = readLine(brData);
 			nrOfSamples = Integer.parseInt(line);
-			acq = new Acquisition(nrOfSamples);
+			acq = new AcquisitionNoOpt(nrOfSamples);
 			
 			
 			for(int i = 0; i < nrOfSamples; i++){
@@ -103,13 +103,13 @@ public class AcquisitionTest {
 			boolean passed = res == acquisition && acq.getCodeVerschiebung()== codeVersch && acq.getDopplerverschiebung() == freq;
 			
 
-		System.out.println("DFT/CONVO");
+		System.out.println("[Test Results]");
 		System.out.println((passed?"PASSED":"FAILED")+ " Test Nr. " + Nr);
 		
 			System.out.println("nrOfSamples: "+nrOfSamples);
-			System.out.println("Epected " + acquisition + " acquistion");
-			System.out.println("    codeShift:    " + codeVersch);
-			System.out.println("    dopplerShift: " + freq);
+			System.out.println("Expected " + acquisition + " acquistion, got "+acquisition);
+			System.out.println("    codeShift:    " + codeVersch + ", got: "+acq.getCodeVerschiebung());
+			System.out.println("    dopplerShift: " + freq+ ", got: "+acq.getDopplerverschiebung());
 		
 		
 

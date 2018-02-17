@@ -3,7 +3,13 @@ package gps.acquisition;
 import cgra.pe.PETrigonometry;
 
 public class Acquisition {
-	private static final int sampleThreshold = 256;
+	private static final int sampleThreshold = 50;
+	
+	//atm just for simulatedAnnealing reasons (composition optimization). 
+	public static void main (String[] args) {
+		Acquisition acq = new Acquisition(400);
+		acq.startAcquisition();
+	}
 	
 	/*
 	 * Necessary infrmation forthe compuation - rest is left out due to unnecessary overhead
@@ -40,11 +46,14 @@ public class Acquisition {
 			private final float[] samplesReal;
 			private final float[] samplesImag;
 		
-			private final float[] codesReal;
-			private final float[] codesImag;
+			private  float[] codesReal;
+			private  float[] codesImag;
 		
-			private final float[] codesDFTReal;
-			private final float[] codesDFTImag;
+			private float[] codesDFTReal;
+			private float[] codesDFTImag;
+			
+			private float[] codesRefReal;
+			private float[] codesRefImag;
 			
 		
 		
@@ -93,6 +102,8 @@ public class Acquisition {
 	    this.oneDivN = 1/nrOfSamples;
 	    
 	    
+	    
+	    
 		if (nrOfSamples > sampleThreshold) { // use fast convolution via ffts
 		    fastConvolution = true;
 		    
@@ -130,7 +141,8 @@ public class Acquisition {
 		     System.out.println("exponent:"+nExponent2);
 		     System.out.println("radix4 "+ (radix4 ? "possible" : "impossible"));
 		    
-		    enteredCodes = N-1;
+		    //enteredCodes = N-1;
+		    enteredCodes = 0;
 		    
 		    
 		    //precomputeFrequencyShifts();
@@ -146,6 +158,9 @@ public class Acquisition {
 		    
 		    codesDFTReal = codesReal;
 		    codesDFTImag = codesImag;
+		    
+		    codesRefReal = new float[N];
+		    codesRefImag = new float[N];
 		    
 		    //bit reversal
 		    indexPointersBitReversed = null;
@@ -178,6 +193,9 @@ public class Acquisition {
 			indexPointersBitReversed = null;
 			codesDFTReal = null;
 			codesDFTImag = null;
+			
+			 codesRefReal = null;//nullnew float[N];
+			 codesRefImag = null;//null new float[N];
 			
 			N = nrOfSamples;
 			enteredCodes = nrOfSamples-1;
@@ -233,9 +251,12 @@ public class Acquisition {
 	public void enterCode(float real, float imag){
 		//int index = indexPointersBitReversed[enteredCodes];
 		// normal codes
-		codesReal[enteredCodes] = real;
-		codesImag[enteredCodes] = -imag;
-		enteredCodes--;
+		codesDFTReal[enteredCodes] = real;
+		codesDFTImag[enteredCodes] = imag;
+		codesRefReal[enteredCodes] = real;
+		codesRefImag[enteredCodes] = imag;
+		//enteredCodes--;
+		enteredCodes++;
 	} //enterCode
 	
 	public boolean startAcquisition(){
@@ -252,15 +273,26 @@ public class Acquisition {
 	    if (radix4) {
 	    	float[] currentFdVectorReal = new float[N];
 		    float[] currentFdVectorImag = new float[N];
+		    final float nFactorRadix4 = 1/(N);
+		    final float nFactorRadix4Squared = nFactorRadix4*nFactorRadix4;
 		    /*
 		     * compute DFT of code vector
 		     */
-		   computeCodesDFTIterativelyRadix4();
 		    
+		   // compareCodes();
+		   computeCodesDFTIterativelyRadix4();
+		   
+		   //computeCodesDFTIterativelyRadix4Inv();
+		   //compareCodes();
+		   
+		   
+		    //System.exit(0);
 		    /*
 		     * Loop: Do the following for each frequency 
 		     */
-		   
+		   final int stages = nExponent2>>1;
+		   final float phaseFactorBase = -2*PI*nFactorRadix4;
+		   final float phaseFactorBaseInverse = -phaseFactorBase;
 		   for (int fd = 0; fd < nrFrequencies; fd++) {
 			   
 			    //final int frequency = minRate+fd*stepRate;
@@ -297,6 +329,104 @@ public class Acquisition {
 		    	 * Radix 4 FFT of Samples for current Frequency
 		    	 */
 		    	
+				int M = N>>2;
+				
+				//outermost loop: recursion level
+				for (int pp = 0; pp<stages; pp++) {
+					int fourPowerLevel = 1 << (pp<<1);
+					// middle loop: index of block
+					float phaseFactorP1Base = 2*fourPowerLevel*phaseFactorBase;
+					float phaseFactorP2Base = fourPowerLevel*phaseFactorBase;
+					float phaseFactorP3Base = 3*fourPowerLevel*phaseFactorBase;
+					
+					for (int index = 0; index <N; index+=(N>>(pp<<1))) {
+						
+						//innermost loop: perform on block, with same twiddle factors
+						for (int nn = 0; nn < M; nn++) {
+							float resultReal0, resultImag0;
+							float resultReal1, resultImag1;
+							float resultReal2, resultImag2;
+							float resultReal3, resultImag3;
+							
+							//fetch required samples from memory
+							float b0Real = currentFdVectorReal[nn+index];
+							float b0Imag = currentFdVectorImag[nn+index];
+							float b1Real = currentFdVectorReal[nn+index+M];
+							float b1Imag = currentFdVectorImag[nn+index+M];
+							float b2Real = currentFdVectorReal[nn+index+2*M];
+							float b2Imag = currentFdVectorImag[nn+index+2*M];
+							float b3Real = currentFdVectorReal[nn+index+3*M];
+							float b3Imag = currentFdVectorImag[nn+index+3*M];
+							
+							//put together result values
+								
+								//result0
+								resultReal0 = b0Real+b1Real+b2Real+b3Real;
+								resultImag0 = b0Imag+b1Imag+b2Imag+b3Imag;
+								
+								//result1
+								resultReal1 = b0Real-b1Real+b2Real-b3Real;
+								resultImag1 = b0Imag-b1Imag+b2Imag-b3Imag;
+									//multiplication with phase factor
+									float phaseFactor1 = phaseFactorP1Base*nn;
+									float phaseFactor1Real = PETrigonometry.cos(phaseFactor1);
+									float phaseFactor1Imag = PETrigonometry.sin(phaseFactor1);
+									
+									float tmp1 = resultReal1;
+									resultReal1 *=phaseFactor1Real;
+									resultReal1 -=phaseFactor1Imag*resultImag1;
+									
+									resultImag1 *=phaseFactor1Real;
+									resultImag1 +=phaseFactor1Imag*tmp1;
+									
+								
+								//result2
+								resultReal2 = b0Real+b1Imag-b2Real-b3Imag;
+								resultImag2 = b0Imag-b1Imag-b2Imag+b3Real;
+									//multiplication with phase factor
+									float phaseFactor2 = phaseFactorP2Base*nn;
+									float phaseFactor2Real = PETrigonometry.cos(phaseFactor2);
+									float phaseFactor2Imag = PETrigonometry.sin(phaseFactor2);
+									
+									float tmp2 = resultReal2;
+									resultReal2 *=phaseFactor2Real;
+									resultReal2 -=phaseFactor2Imag*resultImag2;
+									
+									resultImag2 *=phaseFactor2Real;
+									resultImag2 +=phaseFactor2Imag*tmp2;
+								
+								//result3
+								resultReal3 = b0Real-b1Imag-b2Real+b3Imag;
+								resultImag3 = b0Imag+b1Imag-b2Imag-b3Real;
+									//mulitplication with phase factor
+									float phaseFactor3 = phaseFactorP3Base*nn;
+									float phaseFactor3Real = PETrigonometry.cos(phaseFactor3);
+									float phaseFactor3Imag = PETrigonometry.sin(phaseFactor3);
+									
+									float tmp3 = resultReal3;
+									resultReal3 *=phaseFactor3Real;
+									resultReal3 -=phaseFactor3Imag*resultImag3;
+									
+									resultImag3 *=phaseFactor3Real;
+									resultImag3 +=phaseFactor3Imag*tmp3;
+							
+							
+							//assignments to memory
+							currentFdVectorReal[nn+index] = resultReal0;
+							currentFdVectorImag[nn+index] = resultImag0;
+							
+							currentFdVectorReal[nn+index+M] = resultReal1;
+							currentFdVectorImag[nn+index+M] = resultImag1;
+							
+							currentFdVectorReal[nn+index+2*M] = resultReal2;
+							currentFdVectorImag[nn+index+2*M] = resultImag2;
+							
+							currentFdVectorReal[nn+index+3*M] = resultReal3;
+							currentFdVectorImag[nn+index+3*M] = resultImag3;
+						}//nn
+					} //index
+					M = M>>2;
+				}//p = recursionLevel
 				
 			   
 		    	
@@ -309,7 +439,8 @@ public class Acquisition {
 		    		
 		    		//real part
 		    		currentFdVectorReal[nn] *= codesDFTReal[nn];
-		    		currentFdVectorReal[nn] -= codesDFTImag[nn]*currentFdVectorImag[nn];
+		    		currentFdVectorReal[nn] -= codesDFTImag[nn]*currentFdVectorImag[nn]; // plus due to complex conjugate
+		    																			 //cross correlation and not circular convolution
 		    		
 		    		//imaginary part
 		    		currentFdVectorImag[nn] *= codesDFTImag[nn];
@@ -319,6 +450,106 @@ public class Acquisition {
 		    	/*
 		    	 * Inverse Radix 4 FFT for current frequency
 		    	 */
+		    	
+		    	//reset to N/2 again
+		    	 M = N>>2;
+				
+				//outermost loop: recursion level
+				for (int pp = 0; pp<stages; pp++) {
+					int fourPowerLevel = 1 << (pp<<1);
+					// middle loop: index of block
+					float phaseFactorP1Base = 2*fourPowerLevel*phaseFactorBaseInverse;
+					float phaseFactorP2Base = fourPowerLevel*phaseFactorBaseInverse;
+					float phaseFactorP3Base = 3*fourPowerLevel*phaseFactorBaseInverse;
+					
+					for (int index = 0; index <N; index+=(N>>(pp<<1))) {
+						
+						//innermost loop: perform on block, with same twiddle factors
+						for (int nn = 0; nn < M; nn++) {
+							float resultReal0, resultImag0;
+							float resultReal1, resultImag1;
+							float resultReal2, resultImag2;
+							float resultReal3, resultImag3;
+							
+							//fetch required samples from memory
+							float b0Real = currentFdVectorReal[nn+index];
+							float b0Imag = currentFdVectorImag[nn+index];
+							float b1Real = currentFdVectorReal[nn+index+M];
+							float b1Imag = currentFdVectorImag[nn+index+M];
+							float b2Real = currentFdVectorReal[nn+index+2*M];
+							float b2Imag = currentFdVectorImag[nn+index+2*M];
+							float b3Real = currentFdVectorReal[nn+index+3*M];
+							float b3Imag = currentFdVectorImag[nn+index+3*M];
+							
+							//put together result values
+								
+								//result0
+								resultReal0 = b0Real+b1Real+b2Real+b3Real;
+								resultImag0 = b0Imag+b1Imag+b2Imag+b3Imag;
+								
+								//result1
+								resultReal1 = b0Real-b1Real+b2Real-b3Real;
+								resultImag1 = b0Imag-b1Imag+b2Imag-b3Imag;
+									//multiplication with phase factor
+									float phaseFactor1 = phaseFactorP1Base*nn;
+									float phaseFactor1Real = PETrigonometry.cos(phaseFactor1);
+									float phaseFactor1Imag = PETrigonometry.sin(phaseFactor1);
+									
+									float tmp1 = resultReal1;
+									resultReal1 *=phaseFactor1Real;
+									resultReal1 -=phaseFactor1Imag*resultImag1;
+									
+									resultImag1 *=phaseFactor1Real;
+									resultImag1 +=phaseFactor1Imag*tmp1;
+									
+								
+								//result2
+								resultReal2 = b0Real+b1Imag-b2Real-b3Imag;
+								resultImag2 = b0Imag-b1Imag-b2Imag+b3Real;
+									//multiplication with phase factor
+									float phaseFactor2 = phaseFactorP2Base*nn;
+									float phaseFactor2Real = PETrigonometry.cos(phaseFactor2);
+									float phaseFactor2Imag = PETrigonometry.sin(phaseFactor2);
+									
+									float tmp2 = resultReal2;
+									resultReal2 *=phaseFactor2Real;
+									resultReal2 -=phaseFactor2Imag*resultImag2;
+									
+									resultImag2 *=phaseFactor2Real;
+									resultImag2 +=phaseFactor2Imag*tmp2;
+								
+								//result3
+								resultReal3 = b0Real-b1Imag-b2Real+b3Imag;
+								resultImag3 = b0Imag+b1Imag-b2Imag-b3Real;
+									//mulitplication with phase factor
+									float phaseFactor3 = phaseFactorP3Base*nn;
+									float phaseFactor3Real = PETrigonometry.cos(phaseFactor3);
+									float phaseFactor3Imag = PETrigonometry.sin(phaseFactor3);
+									
+									float tmp3 = resultReal3;
+									resultReal3 *=phaseFactor3Real;
+									resultReal3 -=phaseFactor3Imag*resultImag3;
+									
+									resultImag3 *=phaseFactor3Real;
+									resultImag3 +=phaseFactor3Imag*tmp3;
+							
+							
+							//assignments to memory
+							currentFdVectorReal[nn+index] = resultReal0;
+							currentFdVectorImag[nn+index] = resultImag0;
+							
+							currentFdVectorReal[nn+index+M] = resultReal1;
+							currentFdVectorImag[nn+index+M] = resultImag1;
+							
+							currentFdVectorReal[nn+index+2*M] = resultReal2;
+							currentFdVectorImag[nn+index+2*M] = resultImag2;
+							
+							currentFdVectorReal[nn+index+3*M] = resultReal3;
+							currentFdVectorImag[nn+index+3*M] = resultImag3;
+						}//nn
+					} //index
+					M = M>>2;
+				}//p = recursionLevel
 				
 				
 			   
@@ -330,11 +561,14 @@ public class Acquisition {
 		    	 */
 		    	
 		    	float currentRFDTimesNMaximum = 0;
-		    	for (int ii =0; ii <nrOfSamples-1; ii++) { //TODO check how to implement maximum check for last step 
+		    	int ii = 0;
+		    	for (; ii <nrOfSamples-1; ) { //TODO check how to implement maximum check for last step 
 		    		currentFdVectorReal[ii] += currentFdVectorReal[ii+nrOfSamples];
 		    		currentFdVectorImag[ii] += currentFdVectorImag[ii+nrOfSamples];
 		    		float tmp = currentFdVectorReal[ii]*currentFdVectorReal[ii];
 		    		float tmp2= currentFdVectorImag[ii]*currentFdVectorImag[ii];
+		    		tmp  *= nFactorRadix4Squared;
+		    		tmp2 *= nFactorRadix4Squared;
 		    		
 		    		if (tmp>currentRFDTimesNMaximum-tmp2) {
 		    			tmp = tmp+tmp2;
@@ -343,8 +577,21 @@ public class Acquisition {
 		    			currentRFDTimesNMaximum = tmp;
 		    			
 		    		}// if abs^2 > currentMaximum
-		    		
+		    		ii++;
 		    	}// aliasing and local maximum detection
+		    	//last one (unaliased)
+	    		float tmp = currentFdVectorReal[ii]*currentFdVectorReal[ii];
+	    		float tmp2= currentFdVectorImag[ii]*currentFdVectorImag[ii];
+	    		tmp  *= nFactorRadix4Squared;
+	    		tmp2 *= nFactorRadix4Squared;
+	    		
+	    		if (tmp>currentRFDTimesNMaximum-tmp2) {
+	    			tmp = tmp+tmp2;
+	    			maxSignalPowersTimesN[fd] = tmp;
+	    			maxTauIndices[fd] = ii;
+	    			currentRFDTimesNMaximum = tmp;
+	    			
+	    		}// if abs^2 > currentMaximum
 		   }//fd
 	    } //radix 4
 	    
@@ -658,14 +905,128 @@ public class Acquisition {
 		
 		//outermost loop: recursion level
 		for (int pp = 0; pp<stages; pp++) {
+			
 			int fourPowerLevel = 1 << (pp<<1);
+			
 			// middle loop: index of block
 			float phaseFactorP1Base = 2*fourPowerLevel*phaseFactorBase;
 			float phaseFactorP2Base = fourPowerLevel*phaseFactorBase;
 			float phaseFactorP3Base = 3*fourPowerLevel*phaseFactorBase;
 			//System.out.println("pp = "+pp);
 			//System.out.println("indexIncrement (N>>(pp<<1))= "+ (N>>(pp<<1)));
-			for (int index = 0; index <N; index+=(N>>(pp<<1))) {
+			int inc = N>>(pp<<1);
+			//System.out.println("pp="+pp+"; 4^pp="+fourPowerLevel+"; inc ="+inc+ "; N="+N);
+			for (int index = 0; index <N; index+=inc) {
+				
+				//innermost loop: perform on block
+				for (int nn = 0; nn < M; nn++) {
+					int indexM = index+M; // testing if faster if in outer loop
+					int index2M = index+2*M; //see line above
+					int index3M = index+3*M; //see line above
+					
+					float resultReal0, resultImag0;
+					float resultReal1, resultImag1;
+					float resultReal2, resultImag2;
+					float resultReal3, resultImag3;
+					
+					//fetch required samples from memory
+					float b0Real = codesDFTReal[nn+index];
+					float b0Imag = codesDFTImag[nn+index];
+					float b1Real = codesDFTReal[nn+indexM];
+					float b1Imag = codesDFTImag[nn+indexM];
+					float b2Real = codesDFTReal[nn+index2M];
+					float b2Imag = codesDFTImag[nn+index2M];
+					float b3Real = codesDFTReal[nn+index3M];
+					float b3Imag = codesDFTImag[nn+index3M];
+					
+					//put together result values
+						
+						//result0
+						resultReal0 = b0Real+b1Real+b2Real+b3Real;
+						resultImag0 = b0Imag+b1Imag+b2Imag+b3Imag;
+						
+						//result1
+						resultReal1 = b0Real-b1Real+b2Real-b3Real;
+						resultImag1 = b0Imag-b1Imag+b2Imag-b3Imag;
+							//multiplication with phase factor
+							float phaseFactor1 = phaseFactorP1Base*nn;
+							float phaseFactor1Real = PETrigonometry.cos(phaseFactor1);
+							float phaseFactor1Imag = PETrigonometry.sin(phaseFactor1);
+							
+							float tmp1 = resultReal1;
+							resultReal1 *=phaseFactor1Real;
+							resultReal1 -=phaseFactor1Imag*resultImag1;
+							
+							resultImag1 *=phaseFactor1Real;
+							resultImag1 +=phaseFactor1Imag*tmp1;
+							
+						
+						//result2
+						resultReal2 = b0Real+b1Imag-b2Real-b3Imag;
+						resultImag2 = b0Imag-b1Imag-b2Imag+b3Real;
+							//multiplication with phase factor
+							float phaseFactor2 = phaseFactorP2Base*nn;
+							float phaseFactor2Real = PETrigonometry.cos(phaseFactor2);
+							float phaseFactor2Imag = PETrigonometry.sin(phaseFactor2);
+							
+							float tmp2 = resultReal2;
+							resultReal2 *=phaseFactor2Real;
+							resultReal2 -=phaseFactor2Imag*resultImag2;
+							
+							resultImag2 *=phaseFactor2Real;
+							resultImag2 +=phaseFactor2Imag*tmp2;
+						
+						//result3
+						resultReal3 = b0Real-b1Imag-b2Real+b3Imag;
+						resultImag3 = b0Imag+b1Imag-b2Imag-b3Real;
+							//mulitplication with phase factor
+							float phaseFactor3 = phaseFactorP3Base*nn;
+							float phaseFactor3Real = PETrigonometry.cos(phaseFactor3);
+							float phaseFactor3Imag = PETrigonometry.sin(phaseFactor3);
+							
+							float tmp3 = resultReal3;
+							resultReal3 *=phaseFactor3Real;
+							resultReal3 -=phaseFactor3Imag*resultImag3;
+							
+							resultImag3 *=phaseFactor3Real;
+							resultImag3 +=phaseFactor3Imag*tmp3;
+					
+					
+					//assignments to memory
+					codesDFTReal[nn+index] = resultReal0;
+					codesDFTImag[nn+index] = resultImag0;
+					
+					codesDFTReal[nn+indexM] = resultReal1;
+					codesDFTImag[nn+indexM] = resultImag1;
+					
+					codesDFTReal[nn+index2M] = resultReal2;
+					codesDFTImag[nn+index2M] = resultImag2;
+					
+					codesDFTReal[nn+index2M] = resultReal3;
+					codesDFTImag[nn+index2M] = resultImag3;
+				}//nn
+			} //index
+			M = M>>2;
+		}//p = recursionLevel
+	}//computeCodesDFTIterativelyRadix4
+
+
+	public void computeCodesDFTIterativelyRadix4Inv() {
+		final int stages = nExponent2>>1;
+		final float phaseFactorBase = 2*PI/N;
+		int M = N>>2;
+		
+		//outermost loop: recursion level
+		for (int pp = 0; pp<stages; pp++) {
+			int fourPowerLevel = 1 << (pp<<1);
+			// middle loop: index of block
+			float phaseFactorP1Base = 2*fourPowerLevel*phaseFactorBase;
+			float phaseFactorP2Base = fourPowerLevel*phaseFactorBase;
+			float phaseFactorP3Base = 3*fourPowerLevel*phaseFactorBase;
+			//System.out.println("pp = "+pp);
+			//System.out.println("indexIncrement (N>>(pp<<1))= "+ (N>>(pp<<1)))
+			int inc = (N>>(pp<<1));
+			for (int index = 0; index <N; index+=inc) {
 				
 				//innermost loop: perform on block
 				for (int nn = 0; nn < M; nn++) {
@@ -753,9 +1114,23 @@ public class Acquisition {
 			} //index
 			M = M>>2;
 		}//p = recursionLevel
-	}//computeCodesDFTIterativelyRadix4
-
-
+	}
+	   
+	public void compareCodes() {
+		float byN = 1/N;
+		
+		//aliasing ? 
+		for (int nn=0; nn < nrOfSamples-1; nn++) {
+			codesDFTReal[nn] +=codesDFTReal[nn+nrOfSamples];
+			codesDFTImag[nn] +=codesDFTImag[nn+nrOfSamples];
+		}
+		for (int nn = 0; nn < N; nn++) {
+			double realDiff = codesDFTReal[nn]/N - codesRefReal[nn];
+			double imagDiff = codesDFTImag[nn]/N - codesRefImag[nn];
+			String line = nn+ ":\tref: ("+codesRefReal[nn]+","+codesRefImag[nn]+")  \t computed:("+codesDFTReal[nn]+","+codesDFTImag[nn]+")\t diff: ("+realDiff+","+imagDiff+")";
+			System.out.println(line);
+		}
+	}
 	
 	public void computeCodesDFTIteratively() {
 		

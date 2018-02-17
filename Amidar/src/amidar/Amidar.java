@@ -810,6 +810,7 @@ public class Amidar {
 					cgra.InputCacheValid[i] = true;
 				}
 			} else {
+				System.out.println("generating cdfg");
 				hardwareGenerator.generateCDFG();
 				hardwareGenerator.exportCDFG();
 //				hardwareGenerator.getCDFG();//TODO

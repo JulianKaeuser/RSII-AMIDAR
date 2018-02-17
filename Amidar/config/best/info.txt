@@ -1,0 +1,4 @@
+cost: 3184640.0
+iteration nr. 24550
+############################################
+cgramodel.CgraModelAmidar@3dddbe65

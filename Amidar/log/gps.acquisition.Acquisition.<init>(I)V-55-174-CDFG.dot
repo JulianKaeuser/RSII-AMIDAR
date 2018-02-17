@@ -1,0 +1,20 @@
+digraph depgraph {
+"62:ISHL" -> "63:STORE:2"[label=0];
+"55:LOAD:2" -> "63:STORE:2"[color=gray];
+"57:IFGE" -> "63:STORE:2"[color=red,style=dashed];
+"62:ISHL" -> "63:STORE:2"[color=gray];
+"55:LOAD:2" -> "57:IFGE"[label=0];
+"56:LOAD:1" -> "57:IFGE"[label=1];
+"55:LOAD:2" -> "62:ISHL"[label=0];
+"61:CONST:1" -> "62:ISHL"[label=1];
+"64:LOAD:0(ref)" -> "66:DMA_LOAD"[label=0];
+"71:CONST:9" -> "66:DMA_LOAD"[label=1];
+"57:IFGE" -> "66:DMA_LOAD"[color=red,style=dashed];
+"64:LOAD:0(ref)" -> "71:DMA_STORE"[label=0];
+"71:CONST:9" -> "71:DMA_STORE"[label=1];
+"70:IADD" -> "71:DMA_STORE"[label=2];
+"57:IFGE" -> "71:DMA_STORE"[color=red,style=dashed];
+"66:DMA_LOAD" -> "71:DMA_STORE"[color=gray];
+"66:DMA_LOAD" -> "70:IADD"[label=0];
+"61:CONST:1" -> "70:IADD"[label=1];
+}

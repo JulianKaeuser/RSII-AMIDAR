@@ -1,0 +1,17 @@
+digraph depgraph {
+"23:IADD" -> "23:STORE:4"[label=0];
+"12:LOAD:4" -> "23:STORE:4"[color=gray];
+"15:IFGE" -> "23:STORE:4"[color=red,style=dashed];
+"23:IADD" -> "23:STORE:4"[color=gray];
+"12:LOAD:4" -> "15:IFGE"[label=0];
+"14:LOAD:1" -> "15:IFGE"[label=1];
+"12:LOAD:4" -> "23:IADD"[label=0];
+"23:CONST:1" -> "23:IADD"[label=1];
+"21:DMUL" -> "22:STORE64:2"[label=0];
+"15:IFGE" -> "22:STORE64:2"[color=red,style=dashed];
+"18:LOAD64:2" -> "22:STORE64:2"[color=gray];
+"21:DMUL" -> "22:STORE64:2"[color=gray];
+"18:LOAD64:2" -> "21:DMUL"[label=0];
+"20:I2D" -> "21:DMUL"[label=1];
+"19:LOAD:0" -> "20:I2D"[label=0];
+}

@@ -40,6 +40,7 @@ import javasim.synth.model.instruction.AbstractIF;
 import javasim.synth.model.instruction.Instruction;
 import javasim.synth.model.instruction.StartInstr;
 import javasim.synth.model.instruction.StopInstr;
+import sa.SAMain;
 import scheduler.LPW;
 import scheduler.MissingOperationException;
 import scheduler.NotEnoughHardwareException;
@@ -1916,6 +1917,7 @@ public class HardGen {
 			jwriterdcfg.close();
 			jwriterlog.close();
 			jwritervar.close();
+			SAMain.runSA(cdfg, loopGraph, nrOfLocalVariables, null);
 			
 		} catch (FileNotFoundException e) {
 			// TODO Auto-generated catch block

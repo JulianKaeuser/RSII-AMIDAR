@@ -1,0 +1,4 @@
+cost: 4096000.0
+starting cost was: 4659200.0iteration nr. 24
+############################################
+cgramodel.CgraModelAmidar@265361a
