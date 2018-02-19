@@ -2,12 +2,11 @@ package gps.acquisition;
 
 import cgra.pe.PETrigonometry;
 
-public class Acquisition {
-	private static final int sampleThreshold = 50;
+public class AcquisitionWIP {
 	
 	//atm just for simulatedAnnealing reasons (composition optimization). 
 	public static void main (String[] args) {
-		Acquisition acq = new Acquisition(400);
+		AcquisitionWIP acq = new AcquisitionWIP(400);
 		acq.startAcquisition();
 	}
 	
@@ -22,36 +21,24 @@ public class Acquisition {
 	
 		// pi as constant
 		private final static float PI = (float) 3.1415927;
-		
-		//1 divided by sampling rate
-		private final static float oneByFS = 1/400000;
-		
-		/*
-		 * Pre-Computation of frequency shifts
-		 *
-			// first index: fd; second index: nn
-			private  static float[][] precomputedFrequencyShiftsReal;
-			private  static float[][] precomputedFrequencyShiftsImag;
-			private final static int nrPrecomputedFrequencyShifts = 4096;
-		*/
+		private final static float minusPI = (float) -3.1415927;
 		
 		/*
 		 * Find valid acquisition
 		 */
-			private final static float gamma 		= (float)0.015;
+		private final static float gamma 		= (float)0.015;
 		
-		/*
-		 * samples and codes
-		 */
+	/*
+	 * samples and codes storage
+	 */
 			private final float[] samplesReal;
 			private final float[] samplesImag;
 		
-			private  float[] codesReal;
-			private  float[] codesImag;
-		
-			private float[] codesDFTReal;
+			//holds unprocessed codes after initialization, processed after acquisition
+			private float[] codesDFTReal; 
 			private float[] codesDFTImag;
 			
+			//reference for testing
 			private float[] codesRefReal;
 			private float[] codesRefImag;
 			
@@ -61,15 +48,10 @@ public class Acquisition {
 		 *  numbers for samples, FFT
 		 */
 			private final int nrOfSamples;
-			private int nExponent2		= 1;
+			private int nExponent2	= 1;
 			private final int N;
 			
-		
-		//utlitiy
-			private final float oneDivN;
-			private final float oneDivNrOfSamples;
 			
-			private final boolean fastConvolution;
 			private final boolean radix4;
 		
 		/*
@@ -94,52 +76,42 @@ public class Acquisition {
 		 * Constructor with the desired number of codes.
 		 * @param nrOfSamples
 		 */
-	public Acquisition(int nrOfSamples){
+	public AcquisitionWIP(int nrOfSamples){
 		this.nrOfSamples = nrOfSamples;
-	    this.oneDivNrOfSamples = 1/nrOfSamples;
-	    
-	    
-	    
-	    
-		if (nrOfSamples > sampleThreshold) { // use fast convolution via ffts
-		    fastConvolution = true;
-		    
-		    int nextPowerOfTwo = 2;
-		    while(nextPowerOfTwo<nrOfSamples) {
-		    	nextPowerOfTwo = nextPowerOfTwo << 1;
-		    	nExponent2+=1;
-		    }//find exponent for N
-		    
-		    /*
-		     * In order to work with classical fast fourier transform (radix-2/4 cooley tukey, iterative),
-		     * N must be a power of 2.
-		     * N must also be chosen to be at least as large as 2*nrOfSamples, so that the result of
-		     * ifft(fft(samples) x fft(codes*) is not a distorted result, but is exactly equal to the linear convolution
-		     * of samples * codes. This linear convolution may be transformed into the circular (desired) convolution by 
-		     * time domain aliasing. 
-		     * 
-		     * The goal of this approach is to take advantage of the full cooley-tukey fft for the fast convolution and perform that step in N*log2(n)
-		     * time; ultimately, the choice of N = 2^(ceil(log2(nrOfSamples))+1) instead of a standard convolution/dft with (not necessarily power
-		     * -of-2) nrOfSamples with O(nrOfSamples^2)
-		     */
-		    N = nextPowerOfTwo << 1;
-		    nExponent2++;
-		    oneDivN = (float)1/N;
-		    if ((nExponent2 & 0x1) == 1) {
-		    	radix4 = false;
-		    }
-		    else {
-		    	radix4 = true;
-		    }
-		    //
+	        
+		int nextPowerOfTwo = 2;
+		while(nextPowerOfTwo<nrOfSamples) {
+		    nextPowerOfTwo = nextPowerOfTwo << 1;
+		    nExponent2+=1;
+		}//find exponent for N
+		
+		/*
+		 * In order to work with classical fast fourier transform (radix-2/4 cooley tukey, iterative),
+		 * N must be a power of 2.
+		 * N must also be chosen to be at least as large as 2*nrOfSamples, so that the result of
+		 * ifft(fft(samples) x fft(codes*) is not a distorted result, but is exactly equal to the linear convolution
+		 * of samples * codes. This linear convolution may be transformed into the circular (desired) convolution by 
+		 * time domain aliasing. 
+		 * 
+		 * The goal of this approach is to take advantage of the full cooley-tukey fft for the fast convolution and perform that step in N*log2(n)
+		 * time; ultimately, the choice of N = 2^(ceil(log2(nrOfSamples))+1) instead of a standard convolution/dft with (not necessarily power
+		 * -of-2) nrOfSamples with O(nrOfSamples^2)
+		 */
+		N = nextPowerOfTwo << 1;
+		nExponent2++;
+		radix4 = ((nExponent2 & 0x1) != 1);
+
+		
 		    
 		    //TODO comment out for final hand in
+			 //System.out.println(this.getClass().getName());
 		     System.out.println("nrOfSamples:"+nrOfSamples);
 		     System.out.println("N:"+N);
 		     System.out.println("exponent:"+nExponent2);
 		     System.out.println("radix4 "+ (radix4 ? "possible" : "impossible"));
 		    
 		    //enteredCodes = N-1;
+		    //enteredCodes = nrOfSamples-1;
 		    enteredCodes = 0;
 		    
 		    /*
@@ -147,64 +119,14 @@ public class Acquisition {
 		     */
 		    samplesReal = new float[N];
 		    samplesImag = new float[N];
-		    
-		    codesReal = new float[N];
-		    codesImag = new float[N];
-		    
-		    codesDFTReal = codesReal;
-		    codesDFTImag = codesImag;
+
+		    codesDFTReal =  new float[N];
+		    codesDFTImag =  new float[N];
 		    
 		    codesRefReal = new float[N];
 		    codesRefImag = new float[N];
-		    
-		}//fast convolution
-		
-		else { // use classical convolution
-			fastConvolution = false;
-			radix4 = false;
-			
-			samplesReal = new float[nrOfSamples];
-			samplesImag = new float[nrOfSamples];
-			
-			codesReal = new float[nrOfSamples];
-			codesImag = new float[nrOfSamples];
-			
-			
-			codesDFTReal = null;
-			codesDFTImag = null;
-			
-			 codesRefReal = null;//nullnew float[N];
-			 codesRefImag = null;//null new float[N];
-			
-			N = nrOfSamples;
-			oneDivN = oneDivNrOfSamples;
-			enteredCodes = nrOfSamples-1;
-			
-		}//classical convolution
-	}
+	}//constructor
 	
-	/* not needed by now
-	private static void precomputeFrequencyShifts() {
-		precomputedFrequencyShiftsReal = new float[nrFrequencies][];
-		precomputedFrequencyShiftsImag = new float[nrFrequencies][];
-			for (int fd = 0; fd < nrFrequencies; fd++) {
-				precomputedFrequencyShiftsReal[fd] = new float[nrPrecomputedFrequencyShifts];
-				precomputedFrequencyShiftsImag[fd] = new float[nrPrecomputedFrequencyShifts];
-			}
-			for (int fd = 0; fd < nrFrequencies; fd++) {
-				precomputedFrequencyShiftsReal[fd][0] = 1;
-				precomputedFrequencyShiftsImag[fd][0] = 0;
-				for (int nn = 1; nn < nrPrecomputedFrequencyShifts; nn++) {
-					float phase1 = PI*oneByFS*-2*nn;
-					float phase2 = (fd*stepRate + minRate);
-									
-					float phase = phase1*phase2;
-					precomputedFrequencyShiftsReal[fd][nn] = PETrigonometry.cos(phase);
-					precomputedFrequencyShiftsImag[fd][nn] = PETrigonometry.sin(phase);
-				}// nn loop
-			}// fd loop
-	}//precomputeFrequencyShifts
-	*/
 	
 	/**
 	 * Enters a sample.
@@ -229,8 +151,6 @@ public class Acquisition {
 	 * @param imag the quadrature part
 	 */
 	public void enterCode(float real, float imag){
-		//int index = indexPointersBitReversed[enteredCodes];
-		// normal codes
 		codesDFTReal[enteredCodes] = real;
 		codesDFTImag[enteredCodes] = imag;
 		codesRefReal[enteredCodes] = real;
@@ -247,33 +167,49 @@ public class Acquisition {
 	    float[] maxSignalPowersTimesN = new float[nrFrequencies];
 	    boolean acqResult = false;
 	    
+	    
+	    
 	    /*
 	     * nrOfSamples is such that a fast convolution, as applied in that case, may be replaced by a radix-4 version, which yields significant speedup
 	     * over standard cyclic convolution and over radix 2 (25% less comlex multiplications)
+	     * 
+	     * flow of computations:
+	     * 1. compute radix-4-decimation-in-frequency fft for codes. Codes are flipped by input method. T
+	     * 2. for each frequency do:
+	     *  2.1 multiply sample vector into "currentFdVector" with frequency shift
+	     *  2.2 compute radix-4-decimation-in-frequency fft for "currentFdVector"
+	     *  2.3 element-wise multiply both ffts into "currentFdVector"
+	     *  2.4 apply inverse radix-4-decimation-in-time fft to "currentFdVector"
+	     *  2.5 apply aliasing by nrOfSamples and division by N to "currentFdVector"
+	     *  2.6 find maximum of "currentFdVector, store value, dopplerShift, codeShift into array
+	     * 3. from comparison array, find global maximum; store results.
 	     */
 	    if (radix4) {
 	    	float[] currentFdVectorReal = new float[N];
 		    float[] currentFdVectorImag = new float[N];
 		    final float nFactorRadix4 = 1/(N);
 		    final float nFactorRadix4Squared = nFactorRadix4*nFactorRadix4;
+		    
 		    /*
 		     * compute DFT of code vector
 		     */
 		    
 		   // compareCodes();
 		   computeCodesDFTIterativelyRadix4DIF();
-		   
-		   //computeCodesDFTIterativelyRadix4Inv();
+		   //printCodesOctaveFormat();
+		   compareCodes();
+		  // conjCodes();
+		  // computeCodesDFTIterativelyRadix4DITInverse();
+		   //conjCodes();
 		   //compareCodes();
 		   
 		   
-		    //System.exit(0);
+		    System.exit(0); //testing reasons 
 		    /*
 		     * Loop: Do the following for each frequency 
 		     */
 		   final int stages = nExponent2>>1;
 		   final float phaseFactorBase = -2*PI*nFactorRadix4;
-		   final float phaseFactorBaseInverse = -phaseFactorBase;
 		   for (int fd = 0; fd < nrFrequencies; fd++) {
 			   
 			    //final int frequency = minRate+fd*stepRate;
@@ -307,7 +243,7 @@ public class Acquisition {
 		    	
 			   
 		    	/*
-		    	 * Radix 4 FFT of Samples for current Frequency
+		    	 * Radix 4 FFT of Samples for current Frequency, DIF
 		    	 */
 		    	
 				
@@ -332,7 +268,7 @@ public class Acquisition {
 		    	}// element-wise multiplication in frequency domain
 		    	
 		    	/*
-		    	 * Inverse Radix 4 FFT for current frequency
+		    	 * Inverse Radix 4 FFT for current frequency, DIT
 		    	 */
 		    	
 		    	
@@ -368,8 +304,8 @@ public class Acquisition {
 		    	//last one (unaliased)
 	    		float tmp = currentFdVectorReal[ii]*currentFdVectorReal[ii];
 	    		float tmp2= currentFdVectorImag[ii]*currentFdVectorImag[ii];
-	    		tmp  *= nFactorRadix4Squared;
-	    		tmp2 *= nFactorRadix4Squared;
+	    		//tmp  *= nFactorRadix4Squared;
+	    		//tmp2 *= nFactorRadix4Squared;
 	    		
 	    		if (tmp>currentRFDTimesNMaximum-tmp2) {
 	    			tmp = tmp+tmp2;
@@ -384,7 +320,7 @@ public class Acquisition {
 	    /*
 	     * nrOfSamples is so high that fast convolution brings advantage over classical
 	     */
-	    else if (fastConvolution) {
+	    else {
 
 		    float[] currentFdVectorReal = new float[N];
 		    float[] currentFdVectorImag = new float[N];
@@ -402,13 +338,6 @@ public class Acquisition {
 		    	final float fdEFactorPhase = (float)-0.01570796326*fd; // = (-2*PI*stepRate*1/fs) * fd
 		    	final float fdPrecomputeFactorPhase = fdEFactorPhase + fixPrecomputeEFactorPhase;
 		    	
-		    	            //in this iteration, work on the precomputed factors for the samples of frequency[fd]
-		    	            	//currentFdVectorReal = precomputedFrequencyShiftsReal[fd];
-		    	            	//currentFdVectorImag = precomputedFrequencyShiftsImag[fd];
-		    	
-		    		
-		    		//currentFdVectorReal[0] = 1;
-		    		//currentFdVectorImag[0] = 0; // can be omitted due to java zero initialization
 		    	/*
 		    	 * multiplication with precomputed frequency shifts 
 		    	 */
@@ -559,111 +488,6 @@ public class Acquisition {
    
 		}//fast convolution
 		
-		/*
-		 * classical, circular convolution
-		 */
-		else { 
-			
-			float[] currentFdVectorReal = new float[nrOfSamples];
-		    float[] currentFdVectorImag = new float[nrOfSamples];
-		    
-		    float[] circularResultReal = new float[nrOfSamples];
-		    float[] circularResultImag = new float[nrOfSamples];
-
-		    /*
-		     * Loop: Do the following for each frequency 
-		     */
-		    for (int fd = 0; fd < nrFrequencies; fd++) {
-		    	
-		    	//final int frequency = minRate+fd*stepRate;
-		    	final float fdEFactorPhase = (float)-0.01570796326*fd; // = (-2*PI*stepRate*1/fs) * fd
-		    	final float fdPrecomputeFactorPhase = fdEFactorPhase + fixPrecomputeEFactorPhase;
-		    			    		
-		    		//currentFdVectorReal[0] = 1;
-		    		//currentFdVectorImag[0] = 0; // can be omitted due to java zero initialization
-		    	/*
-		    	 * multiplication with precomputed frequency shifts 
-		    	 */
-		    	
-		    	for (int nn = 0; nn < nrOfSamples; nn++) {
-		    		
-		    		//multiply phase with nn here; is faster than incrementing by its initial value every loop -> independent loop iterations
-		    		float nnPhasePrecompute = fdPrecomputeFactorPhase*nn;
-		    		
-		    		//evaluate imaginary e function
-		    		float factorReal = PETrigonometry.cos(nnPhasePrecompute);
-		    		currentFdVectorReal[nn] = factorReal;
-		    		
-		    		float factorImag = PETrigonometry.sin(nnPhasePrecompute);
-		    		currentFdVectorImag[nn] = factorImag;
-		    		
-		    		//actual multiplication
-		    		// real part
-		    			currentFdVectorReal[nn] *= samplesReal[nn];
-		    			currentFdVectorReal[nn] -= samplesImag[nn]*factorImag;
-		    		//imagninary part
-		    			currentFdVectorImag[nn] *= samplesReal[nn];
-		    			currentFdVectorImag[nn] += factorReal*samplesImag[nn];
-		    	}//multiplication
-		    	
-		    	/*
-		    	 * circular convolution
-		    	 */
-		    	for (int nn = 0; nn < nrOfSamples; nn++) {
-		    		
-
-		    		// index is the evaluation of (n-i)mod nrOfSamples
-		    		//   for each loop iteration of the outer loop (nn = const)
-		    		//   index starts a nn, then goes down to zero in the first loop,
-		    		//   then goes up again; in total, index has nrOfSamples values in one
-		    		//   iteration of the outer loop
-		    		int index1 = nn;
-		    		int index2 = -nn;
-		    		
-		    		float accReal = 0;
-		    		float accImag = 0;
-		    		float accReal2 = 0;
-		    		float accImag2 = 0;
-		    		for (int ii = 0; ii<nrOfSamples; ii++) {
-		    			//multiplication
-		    			float factorAReal = currentFdVectorReal[ii];
-		    		    float factorAImag = currentFdVectorImag[ii];
-		    		    int index = ii < nn ? index1 : index2;
-		    		    float factorBReal = codesReal[index];
-		    		    float factorBImag = codesImag[index];
-		    		    
-		    		    accReal += factorAReal*factorBReal;
-		    		    accReal -= factorAImag*factorBImag;
-		    		    accImag += factorAReal*factorBImag;
-		    		    accImag += factorBReal*factorAImag;
-		    		    
-		    		    // adapt index;
-		    			index1--;
-		    			index2++;
-		    		}// ii
-		    		
-
-		    		
-		    		
-		    		circularResultReal[nn] = accReal;
-		    		circularResultImag[nn] = accImag;
-		    	}// nn
-		    	
-		    	float currentRFDTimesNMaximum = 0;
-		    	for (int ii =0; ii <nrOfSamples; ii++) {
-		    		float tmp = circularResultReal[ii]*circularResultReal[ii];
-		    		float tmp2= circularResultImag[ii]*circularResultImag[ii];
-		    		if (tmp>currentRFDTimesNMaximum-tmp2) {
-		    			tmp = tmp+tmp2;
-		    			maxSignalPowersTimesN[fd] = tmp;
-		    			maxTauIndices[fd] = ii;
-		    			currentRFDTimesNMaximum = tmp;			
-		    		}// if abs^2 > currentMaximum
-		    	}// local maximum detection
-		    }//fd
-			
-		}//classical convolution
-		
 		
 		/*
 		 * Equal for both variants:
@@ -680,21 +504,31 @@ public class Acquisition {
 	    // assigments
 	    codeShift = maxTauIndex+1;
 	    dopplerShift = maxFdIndex*stepRate + minRate; 
-	    acqResult =  maxSignalPowerTimesN > pInTimesNrOfSamples*gamma;
+	    acqResult =  maxSignalPowerTimesN > pInTimesNrOfSamples*gamma*N*N; //division by N had been omitted in inverse FFT; this way, only needed once
 		return acqResult;
 	}//startAcquisition
 	
+	/**
+	 * Computes the Radix-4 Decimation-in-Frequency FFT in an iterative way for the codes vector.
+	 * In-place method - the result is stored in the code vector itself.
+	 * As a prerequisite, the length of the code vector must be a even power of two (= power of four).
+	 
+	 */
 	public void computeCodesDFTIterativelyRadix4DIF() {
+		
+		/*
+		 * As DIF produces bit reversed index -ordered output from normal ordered input, and vice versa,
+	     * the output is not(!) in normal order. This is, in our case, not necessary, if the inverse FFT is a DIT
+	     * approach, which would take bit-reverse index ordered input and produces natural ordered output.
+		 */
 		final int stages = nExponent2>>1; //log(2)/2
 		final float phaseFactorBase = -2*PI/N;
-		int M = N>>2; // N/4
+		int M = N>>2; // M = N/4
 		
 		//outermost loop: recursion level
-		for (int pp = 0; pp<stages; pp++) {
-			
+		for (int pp = 0; pp<stages; pp++) {			
 			int fourPowerLevel = 1 << (pp<<1);
-			
-			
+	
 			float phaseFactorP1Base = 2*fourPowerLevel*phaseFactorBase;
 			float phaseFactorP2Base = fourPowerLevel*phaseFactorBase;
 			float phaseFactorP3Base = 3*fourPowerLevel*phaseFactorBase;
@@ -749,7 +583,7 @@ public class Acquisition {
 						
 						//result2
 						resultReal2 = b0Real+b1Imag-b2Real-b3Imag;
-						resultImag2 = b0Imag-b1Imag-b2Imag+b3Real;
+						resultImag2 = b0Imag-b1Real-b2Imag+b3Real;
 							//multiplication with phase factor
 							float phaseFactor2 = phaseFactorP2Base*nn;
 							float phaseFactor2Real = PETrigonometry.cos(phaseFactor2);
@@ -764,7 +598,7 @@ public class Acquisition {
 						
 						//result3
 						resultReal3 = b0Real-b1Imag-b2Real+b3Imag;
-						resultImag3 = b0Imag+b1Imag-b2Imag-b3Real;
+						resultImag3 = b0Imag+b1Real-b2Imag-b3Real;
 							//mulitplication with phase factor
 							float phaseFactor3 = phaseFactorP3Base*nn;
 							float phaseFactor3Real = PETrigonometry.cos(phaseFactor3);
@@ -796,83 +630,114 @@ public class Acquisition {
 		}//p = recursionLevel
 	}//computeCodesDFTIterativelyRadix4
 
-
+	public void conjCodes() {
+		for (int nn = 0; nn < N; nn++) {
+			codesDFTImag[nn] *= -1;
+		}
+	}
+	
+	public void printCodesOctaveFormat() {
+		String st = "[";
+		for (int nn = 0; nn < N; nn++) {
+			st+= codesDFTReal[nn] +" + "+codesDFTImag[nn]+ "i ";
+		}
+		st += "]";
+		System.out.println(st);
+	}
+	
+	/**
+	 * For Testing the inverse DIT approach
+	 * Computes the inverse FFT (without scaling 1/N) of the codes vector with an iterative Decimation-in-Time radix-4
+	 * approach. 
+	 */
 	public void computeCodesDFTIterativelyRadix4DITInverse() {
+		
+		/*
+		 * The DIT-Approach usually takes bit-reversed index ordered inputs and produces normal-ordered
+		 * outputs. Therefore, make sure that the input is bit-reversed index ordered (e.g. by explicit reordering
+		 * or creating it from a DIF-Forward FFT (our case)).
+		 */
 		final int stages = nExponent2>>1; // log2(N)/2;
 		
-		final float phaseFactorBase = 2*PI/N; //no minus because of inversion
+		final float phaseFactorBase = minusPI/N; //no minus because of inversion 
 		
-		for (int pp = 0; pp<stages; pp++) {
+		final float phaseFactorBase1 = phaseFactorBase*2;
+		final float phaseFactorBase2 = phaseFactorBase*4;
+		final float phaseFactorBase3 = phaseFactorBase*6;
+		
+		for (int pp = 0; pp<stages; pp++) {                                    
 			int fourPowerLevel = 4<<(pp<<1);
-			int offset = 1<<(pp<<1);
-			int offset2 = offset<<1;
-			int offset3 = 3*offset;
+			int offset = 1<<(pp<<1); 
+			int offset2 = offset<<1; //offset*2;
+			int offset3 = 3*offset; //offset *3;
 			int phaseFactorInc = N/fourPowerLevel; //TODO excahnge with shifts
 			for (int index = 0; index < N; index+=fourPowerLevel) {
 				int kk = 0;
 				for (int nn = index; nn < index+offset; nn++) {
 					
 					//phase factors
-					float phaseFactorKK = phaseFactorBase*kk;
+					float phaseFactorKK = phaseFactorBase1*kk; //angleb
+					float phaseFactor2KK = phaseFactorBase2*kk; //anglec
+					float phaseFactor3KK = phaseFactorBase3*kk; //angled
 					
-					float phaseFactor1Real = PETrigonometry.cos(phaseFactorKK);
+					float phaseFactor1Real = PETrigonometry.cos(phaseFactorKK);//angleb
 				    float phaseFactor1Imag = PETrigonometry.sin(phaseFactorKK);
 				    
-				    float phaseFactor2Real = PETrigonometry.cos(2*phaseFactorKK);
-				    float phaseFactor2Imag = PETrigonometry.sin(2*phaseFactorKK);
+				    float phaseFactor2Real = PETrigonometry.cos(phaseFactor2KK); //anglec
+				    float phaseFactor2Imag = PETrigonometry.sin(phaseFactor2KK);
 				    
-				    float phaseFactor3Real = PETrigonometry.cos(3*phaseFactorKK);
-				    float phaseFactor3Imag = PETrigonometry.sin(3*phaseFactorKK);
+				    float phaseFactor3Real = PETrigonometry.cos(phaseFactor3KK); //angled
+				    float phaseFactor3Imag = PETrigonometry.sin(phaseFactor3KK);
 				    		
 					//fetch required samples from memory
-					float b0Real = codesDFTReal[nn];
+					float b0Real = codesDFTReal[nn];			//val0
 					float b0Imag = codesDFTImag[nn];
-					float b1Real = codesDFTReal[nn+offset];
+					float b1Real = codesDFTReal[nn+offset];		//val1
 					float b1Imag = codesDFTImag[nn+offset];
-					float b2Real = codesDFTReal[nn+offset2];
+					float b2Real = codesDFTReal[nn+offset2];	//val2
 					float b2Imag = codesDFTImag[nn+offset2];
-					float b3Real = codesDFTReal[nn+offset3];
+					float b3Real = codesDFTReal[nn+offset3];	//val3
 					float b3Imag = codesDFTImag[nn+offset3];
 					
 					// multiplication with phase factors
-						//complex a0 = b0*phaseFactor0 (1);
-						//complex a1 = b2*phaseFactor1 
-					    //complex a2 = b1*phaseFactor2
-					    //complex a3 = b3*phaseFactor3;#
 					
 					float a0Real, a0Imag;
 					float a1Real, a1Imag;
 					float a2Real, a2Imag;
 					float a3Real, a3Imag;
 					
-					//a0
+					//a0 //val0 = val0
 					a0Real = b0Real;
 					a0Imag = b0Imag;
 					
-					//a1
+					//a1 //b2 = angleb * val2
 					a1Real = b2Real*phaseFactor1Real - b2Imag*phaseFactor1Imag;
 					a1Imag = b2Real*phaseFactor1Imag + b2Imag*phaseFactor1Real;
 					
-					//a2
+					//a2 // c1 = anglec * val1
 					a2Real = b1Real*phaseFactor2Real - b1Imag*phaseFactor2Imag;
 					a2Imag = b1Real*phaseFactor2Imag + b1Imag*phaseFactor2Real;
 					
-					//a3
+					//a3 //= d3 = angled * val3
 					a3Real = b3Real*phaseFactor3Real - b3Imag*phaseFactor3Imag;
 					a3Imag = b3Real*phaseFactor3Imag + b3Imag*phaseFactor3Real;
 					
 					//assign to memory
+						//+val0 + c1 + b2 + d3
 					codesDFTReal[nn] = a0Real + a2Real + a1Real + a3Real;
 					codesDFTImag[nn] = a0Imag + a2Imag + a1Imag + a3Imag;
 					
-					codesDFTReal[nn+offset] = a0Real - a2Real;
-					codesDFTImag[nn+offset] = 0;
+						//+val0 - c1 -b2i + d3i
+					codesDFTReal[nn+offset] = a0Real - a2Real + a1Imag - a3Imag;
+					codesDFTImag[nn+offset] = a0Real - a2Imag - a1Real + a3Real;
 					
-					codesDFTReal[nn+offset2] = 0;
-					codesDFTImag[nn+offset2] = 0;
+						//+val0 + c1 - b2 -d3
+					codesDFTReal[nn+offset2] = a0Real + a2Real - a1Real - a3Real; 
+					codesDFTImag[nn+offset2] = a0Real + a2Imag -a1Imag - a3Imag;
 					
-					codesDFTReal[nn+offset3] = 0;
-					codesDFTImag[nn+offset3] = 0;
+						// +val0 - c1 +b2i -d3i
+					codesDFTReal[nn+offset3] = a0Real - a2Real - a1Imag + a3Imag;
+					codesDFTImag[nn+offset3] = a0Imag - a2Imag + a1Real - a3Real;
 				    		
 					kk +=phaseFactorInc;
 				}//nn loop
@@ -885,14 +750,15 @@ public class Acquisition {
 		float byN = 1/N;
 		
 		//aliasing ? 
-		for (int nn=0; nn < nrOfSamples-1; nn++) {
-			codesDFTReal[nn] +=codesDFTReal[nn+nrOfSamples];
-			codesDFTImag[nn] +=codesDFTImag[nn+nrOfSamples];
-		}
+		//for (int nn=0; nn < nrOfSamples-1; nn++) {
+		//	codesDFTReal[nn] +=codesDFTReal[nn+nrOfSamples];
+		//	codesDFTImag[nn] +=codesDFTImag[nn+nrOfSamples];
+		//}
 		for (int nn = 0; nn < N; nn++) {
 			double realDiff = codesDFTReal[nn]/N - codesRefReal[nn];
 			double imagDiff = codesDFTImag[nn]/N - codesRefImag[nn];
-			String line = nn+ ":\tref: ("+codesRefReal[nn]+","+codesRefImag[nn]+")  \t computed:("+codesDFTReal[nn]+","+codesDFTImag[nn]+")\t diff: ("+realDiff+","+imagDiff+")";
+			//String line = nn+ ":\tref: ("+codesRefReal[nn]+","+codesRefImag[nn]+")  \t computed:("+codesDFTReal[nn]+","+codesDFTImag[nn]+")\t diff: ("+realDiff+","+imagDiff+")";
+			String line = codesDFTReal[nn] + " + "+ codesDFTImag[nn]+"i";
 			System.out.println(line);
 		}
 	}
@@ -943,16 +809,28 @@ public class Acquisition {
 		}
 	}	//codesDFT
 
+	
+	
+	
+	
 /*
- * Getters
+ * Getters for the output data
  */
 
-public int getDopplerverschiebung(){
-	return dopplerShift;
-}//getDopplerverschiebung
+	/**
+	 * Returns the computed doppler shift
+	 * @return the doppler shift
+	 */
+	public int getDopplerverschiebung(){
+		return dopplerShift;
+	}//getDopplerverschiebung
 
-public int getCodeVerschiebung(){
-	return codeShift;
-} // getCodeVerschiebung
+	/**
+	 * Returns the found code shift
+	 * @return the code shift
+	 */
+	public int getCodeVerschiebung(){
+		return codeShift;
+	} // getCodeVerschiebung
 
-}
+}//end of class

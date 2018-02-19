@@ -11,7 +11,7 @@ public class AcquisitionTest {
 	public static void main(String[] args) {
 		
 
-		Acquisition acq = null;
+		AcquisitionWIP acq = null;
 		
 		int testNr = 1;
 
@@ -39,7 +39,7 @@ public class AcquisitionTest {
 			String line = readLine(brData);
 			nrOfSamples = Integer.parseInt(line);
 			
-			acq = new Acquisition(nrOfSamples);
+			acq = new AcquisitionWIP(nrOfSamples);
 
 			
 			for(int i = 0; i < nrOfSamples; i++){
