@@ -23,6 +23,7 @@ public class AcquisitionWIP {
 		// pi as constant
 		private final static float PI = (float) 3.14159265359;
 		private final static float minusPI = (float) -3.14159265359;
+		private final static float minus2PI = (float) 2*minusPI;
 		
 		/*
 		 * Find valid acquisition
@@ -151,7 +152,6 @@ public class AcquisitionWIP {
 		codesDFTReal[enteredCodes] = real;
 		codesDFTImag[enteredCodes] = imag;
 		enteredCodes--;
-		//enteredCodes--;
 	} //enterCode
 	
 	public boolean startAcquisition(){
@@ -162,8 +162,7 @@ public class AcquisitionWIP {
 	    float[] maxSignalPowersTimesN = new float[nrFrequencies];
 	    boolean acqResult = false;
 	    
-	    float[][] fdReals = new float[nrFrequencies][];
-	    float[][] fdImags = new float[nrFrequencies][];
+
 	    
 	    
 	    
@@ -176,51 +175,26 @@ public class AcquisitionWIP {
 	     * 2. for each frequency do:
 	     *  2.1 multiply sample vector into "currentFdVector" with frequency shift
 	     *  2.2 compute radix-4-decimation-in-frequency fft for "currentFdVector"
-	     *  2.3 element-wise multiply both ffts into "currentFdVector"
+	     *  2.3 element-wise multiply both ffts into "currentFdVector", complex conjugate the result
 	     *  2.4 apply inverse radix-4-decimation-in-time fft to "currentFdVector"
 	     *  2.5 apply aliasing by nrOfSamples and division by N to "currentFdVector"
 	     *  2.6 find maximum of "currentFdVector, store value, dopplerShift, codeShift into array
 	     * 3. from comparison array, find global maximum; store results.
 	     */
 	    if (radix4) {
-	    	
-		    
 		    
 		    /*
 		     * compute DFT of code vector
 		     */
-		    //printArraysOctaveFormat("codes unprocessed", true, codesDFTReal, codesDFTImag);
-		   computeCodesDFTIterativelyRadix4DIF(); //correct so far
-		   //printArraysOctaveFormat("after 1 time dif", true, codesDFTReal, codesDFTImag);
-		 //  conjCodes(1);
-		   
-		   //printArraysOctaveFormat("before dit",true, codesDFTReal, codesDFTImag);
-		  // computeCodesDFTIterativelyRadix4DIT();
-		  // conjCodes(N);
-		   
-		  // printArraysOctaveFormat("after dif->conj->dit->conj->/=N(",false, codesDFTReal, codesDFTImag);
-
-		//   conjCodes(N);
-		//  compareCodes();
-		//  System.exit(0);
-		   //TODO delete this stuff all when done / before hand in
-		   
-		   
-		   
+		   computeCodesDFTIterativelyRadix4DIF(); //correct so far		    
 		     
 		    /*
 		     * Loop: Do the following for each frequency 
 		     */
 		   for (int fd = 0; fd < nrFrequencies; fd++) {
-			   //System.out.print("omit fd loop");
 			   float[] currentFdVectorReal = new float[N];
 			   float[] currentFdVectorImag = new float[N];
-			   fdReals[fd] = currentFdVectorReal;
-			   fdImags[fd] = currentFdVectorImag;
 					  
-			   
-			   
-			    //final int frequency = minRate+fd*stepRate;
 		    	final float fdEFactorPhase = (float)-0.01570796326*fd; // = (-2*PI*stepRate*1/fs) * fd
 		    	final float fdPrecomputeFactorPhase = fdEFactorPhase + fixPrecomputeEFactorPhase;
 		    	
@@ -230,7 +204,9 @@ public class AcquisitionWIP {
 		    	
 		    	for (int nn = 0; nn < nrOfSamples; nn++) {
 		    		
-		    		//multiply phase with nn here; is faster than incrementing by its initial value every loop -> independent loop iterations
+		    		//multiply phase with nn here;
+		    		//is faster than incrementing by its initial value every loop -> independent loop iterations
+		    		// should also be better for precision 
 		    		float nnPhasePrecompute = fdPrecomputeFactorPhase*nn;
 		    		
 		    		//evaluate imaginary e function
@@ -249,7 +225,6 @@ public class AcquisitionWIP {
 		    			currentFdVectorImag[nn] += factorReal*samplesImag[nn];
 		    	}//multiplication
 		    	
-		    	printArraysOctaveFormat(fd + "= fd ", true, currentFdVectorReal, currentFdVectorImag);
 			   
 		    	/*
 		    	 * Radix 4 FFT of Samples for current Frequency, DIF
@@ -260,7 +235,7 @@ public class AcquisitionWIP {
 			              * approach, which would take bit-reverse index ordered input and produces natural ordered output.
 				          */
 				final int stages = nExponent2Final>>1; //log(2)/2
-				final float phaseFactorBaseDIF = 2*minusPI/N;
+				final float phaseFactorBaseDIF = minus2PI/N;
 				int M = N>>2; // M = N/4
 				
 				
@@ -368,9 +343,7 @@ public class AcquisitionWIP {
 					M = M>>2;
 				}//p = recursionLevel
 				
-				//so far, error of 10^-3... keep testing
 				
-		    	printArraysOctaveFormat("fd"+fd+" after DIF", true, currentFdVectorReal, currentFdVectorImag);
 		    	/*
 		    	 * multiply in frequency domain
 		    	 */
@@ -381,19 +354,12 @@ public class AcquisitionWIP {
 		    		//real part
 		    		currentFdVectorReal[nn] *= codesDFTReal[nn];
 		    		currentFdVectorReal[nn] -= codesDFTImag[nn]*currentFdVectorImag[nn]; 
-		    		currentFdVectorReal[nn] /=N;
-		    		
-		    																			 
-		    		
+ 		
 		    		//imaginary part
 		    		currentFdVectorImag[nn] *= codesDFTReal[nn];  
 		    		currentFdVectorImag[nn] += codesDFTImag[nn]*aTmp;
-		    		currentFdVectorImag[nn] *= (float) -1; //conjugate complex -> next forward fft will be reversed
-		    		currentFdVectorImag[nn] /= N;
+		    		currentFdVectorImag[nn] *= -1;  //apply complex conjugation to use forward fft as inverse
 		    	}// element-wise multiplication in frequency domain
-		    	
-		    	printArraysOctaveFormat("fd"+fd+" after freq domain mult", true, currentFdVectorReal, currentFdVectorImag);
-		    	
 		    	
 		    	/*
 		    	 * Inverse Radix 4 FFT for current frequency, DIT
@@ -421,7 +387,7 @@ public class AcquisitionWIP {
 					final int offset2 = offset<<1; //offset*2;
 					final int offset3 = 3*offset; //offset *3;
 					
-					final int phaseFactorInc = N/fourPowerLevel; //TODO exchange with shifts
+					final int phaseFactorInc = (N>>((pp<<1)+2)); //TODO exchange with shifts
 					for (int index = 0; index < N; index+=fourPowerLevel) {
 						int kk = 0;
 						for (int nn = index; nn < index+offset; nn++) {
@@ -493,19 +459,18 @@ public class AcquisitionWIP {
 					//}
 				}//pp = recursion level	
 				
-		    	printArraysOctaveFormat("fd"+fd+" after ifft DIT", true, currentFdVectorReal, currentFdVectorImag);
+		    	
 
 
-			   /*
+			    /*
 		    	 *  apply time domain aliasing to rearrange tau indices correctly 
 		    	 *  (downsampling in frequency domain, but more accurate in time domain in our case)
-		    	 *       apply scaling by 1/N after inverse FFT here, also
 		    	 */
 		    	
 		    	float currentRFDTimesNMaximum = 0;
 		    	int maxTauIndexFd = 0;
 		    	int ii;
-		    	for (ii = 0; ii <nrOfSamples; ii++) { //TODO check how to implement maximum check for last step 
+		    	for (ii = 0; ii <nrOfSamples; ii++) { 
 		    		//aliasing: add up what should have been wrapped
 		    		currentFdVectorReal[ii] += currentFdVectorReal[ii+nrOfSamples];
 		    		currentFdVectorImag[ii] += currentFdVectorImag[ii+nrOfSamples];
@@ -514,8 +479,6 @@ public class AcquisitionWIP {
 		    		
 		    		float tmp  = currentFdVectorReal[ii]*currentFdVectorReal[ii];
 		    		float tmp2 = currentFdVectorImag[ii]*currentFdVectorImag[ii];
-		    		//tmp  *= nFactorRadix4Squared;
-		    		//tmp2 *= nFactorRadix4Squared;
 		    		
 		    		if (tmp>currentRFDTimesNMaximum-tmp2) {
 		    			tmp = tmp+tmp2;
@@ -528,23 +491,206 @@ public class AcquisitionWIP {
 		    	
 	    		maxTauIndices[fd] = maxTauIndexFd;
 	    		maxSignalPowersTimesN[fd] = currentRFDTimesNMaximum;
-	    		
-	    		printArraysOctaveFormat("fd"+fd+" after aliasing", true, currentFdVectorReal, currentFdVectorImag);
 		   }//fd
 	    } //radix 4
 	    
-	    for (int fd = 0; fd < nrFrequencies; fd++) {
-	    	float[] absVector = new float[N];
-    		float[] nullVector = new float[N];
-    		
-    		for (int nn = 0; nn < N; nn++) {
-    			absVector[nn] = fdReals[fd][nn]*fdReals[fd][nn] + fdImags[fd][nn]*fdImags[fd][nn];
-    			absVector[nn] /= (N*N);
-    		}
-    		printArraysOctaveFormat("a"+fd, true, absVector);
-    		
+	    /*
+	     * nrOfSamples is such that a fast convolution, as applied in that case, must only be replaced by a radix-2 version,  
+	     * flow of computations:
+	     * 1. compute radix-2-decimation-in-frequency fft for codes. Codes are flipped by input method. 
+	     * 2. for each frequency do:
+	     *  2.1 multiply sample vector into "currentFdVector" with frequency shift
+	     *  2.2 compute radix-2-decimation-in-frequency fft for "currentFdVector"
+	     *  2.3 element-wise multiply both ffts into "currentFdVector", complex conjugate the result
+	     *  2.4 apply inverse radix-2-decimation-in-time fft to "currentFdVector"
+	     *  2.5 apply aliasing by nrOfSamples and division by N to "currentFdVector"
+	     *  2.6 find maximum of "currentFdVector, store value, dopplerShift, codeShift into array
+	     * 3. from comparison array, find global maximum; store results.
+	     */
+	    else { //radix 2
 	    	
-	    }
+	    	/*
+	    	 * Compute DFT of Codes vector
+	    	 */
+	    	computeCodesDFTIterativelyRadix2DIF();
+	    	
+	    		    	
+	    	/*
+	    	 * For each frequency do: 
+	    	 */
+	    	for (int fd = 0; fd < nrFrequencies; fd++) {
+	    		float[] currentFdVectorReal = new float[N];
+	    		float[] currentFdVectorImag = new float[N];
+	    		
+	    		// multiplication with unity root(fd)
+	    		final float fdEFactorPhase = (float)-0.01570796326*fd; // = (-2*PI*stepRate*1/fs) * fd
+		    	final float fdPrecomputeFactorPhase = fdEFactorPhase + fixPrecomputeEFactorPhase;
+		    	
+		    	/*
+		    	 * multiplication with precomputed frequency shifts 
+		    	 */
+		    	
+		    	for (int nn = 0; nn < nrOfSamples; nn++) {
+		    		
+		    		//multiply phase with nn here;
+		    		//is faster than incrementing by its initial value every loop -> independent loop iterations
+		    		// should also be better for precision 
+		    		float nnPhasePrecompute = fdPrecomputeFactorPhase*nn;
+		    		
+		    		//evaluate imaginary e function
+		    		float factorReal = PETrigonometry.cos(nnPhasePrecompute);
+		    		currentFdVectorReal[nn] = factorReal;
+		    		
+		    		float factorImag = PETrigonometry.sin(nnPhasePrecompute);
+		    		currentFdVectorImag[nn] = factorImag;
+		    		
+		    		//actual multiplication
+		    		// real part
+		    			currentFdVectorReal[nn] *= samplesReal[nn];
+		    			currentFdVectorReal[nn] -= samplesImag[nn]*factorImag;
+		    		//imagninary part
+		    			currentFdVectorImag[nn] *= samplesReal[nn];
+		    			currentFdVectorImag[nn] += factorReal*samplesImag[nn];
+		    	}//multiplication
+		    	
+		    	/*
+		    	 * Radix-2 DIF FFT of sample vector
+		    	 */
+		    	final int stages = nExponent2Final;
+				final float phaseFactorExp = minus2PI/N;
+				
+				for (int pp = 0; pp < stages; pp++) {
+					final int twoPowerLevel = 1<<(pp);
+					final int halfsize = N>>(pp+1);
+					final int size = N>>(pp);
+					
+					for (int index = 0; index < twoPowerLevel; index++) {
+						final int beginKK = index*size;
+						final int endKK = beginKK+halfsize;
+						int phaseFactorInc = 0;
+						for (int nn = beginKK; nn < endKK; nn++) {
+							 
+							
+							final float tmpReal = currentFdVectorReal[nn];
+							final float tmpImag = currentFdVectorImag[nn];
+							
+							final float phaseFactor = phaseFactorInc*phaseFactorExp;
+							final float phaseFactorReal = PETrigonometry.cos(phaseFactor);
+							final float phaseFactorImag = PETrigonometry.sin(phaseFactor);
+							
+							final float a0Real = tmpReal - currentFdVectorReal[nn+halfsize];
+							final float a0Imag = tmpImag - currentFdVectorImag[nn+halfsize];
+							
+							float b0Real  = a0Real*phaseFactorReal;
+								  b0Real -= a0Imag*phaseFactorImag;
+								  
+							float b0Imag  = a0Imag*phaseFactorReal;
+							      b0Imag += a0Real*phaseFactorImag;
+							
+							//assignments to memory
+							currentFdVectorReal[nn] = tmpReal + currentFdVectorReal[nn+halfsize];
+							currentFdVectorImag[nn] = tmpImag + currentFdVectorImag[nn+halfsize];
+							
+							currentFdVectorReal[nn+halfsize] = b0Real;
+							currentFdVectorImag[nn+halfsize] = b0Imag;
+							
+							phaseFactorInc += twoPowerLevel;
+						}//nn
+					}// index
+				}//pp
+		    	
+		    	/*
+		    	 * multiply in frequency domain
+		    	 */
+		    	
+		    	for (int nn = 0; nn < N; nn++) {
+		    		float aTmp = currentFdVectorReal[nn];
+		    		
+		    		//real part
+		    		currentFdVectorReal[nn] *= codesDFTReal[nn];
+		    		currentFdVectorReal[nn] -= codesDFTImag[nn]*currentFdVectorImag[nn]; 
+		    		
+		    		//imaginary part
+		    		currentFdVectorImag[nn] *= codesDFTReal[nn];  
+		    		currentFdVectorImag[nn] += codesDFTImag[nn]*aTmp;
+		    		currentFdVectorImag[nn] *= -1;  //apply complex conjugation to use forward fft as inverse
+		    	}// element-wise multiplication in frequency domain
+		    	
+		    	/*
+		    	 * Radix-2 DIT FFT of sample vector -> works as inverse fft 
+		    	 */
+		    		//final int stages = nExponent2Final; yet defined
+				final float phaseFactorBase = minus2PI/N;
+				
+				for (int pp = 0; pp < stages; pp++) {
+					final int twoPowerLevel = 2<<(pp);
+					final int offset = 1<<(pp);
+					
+					final int phaseFactorInc = (N>>(pp+1));
+					for (int index = 0; index < N; index += twoPowerLevel) {
+						int kk = 0;
+						for (int nn = index; nn < index+offset; nn++) {
+							//angle
+							final float phaseFactor  = phaseFactorBase*kk;
+							
+							//phase factor values re, im
+							final float phaseFactorReal = PETrigonometry.cos(phaseFactor);
+							final float phaseFactorImag = PETrigonometry.sin(phaseFactor);
+							
+							//multiply with phase factor
+							  float b0Real  = phaseFactorReal*currentFdVectorReal[nn+offset];
+									b0Real -= phaseFactorImag*currentFdVectorImag[nn+offset];
+									
+							  float b0Imag  = phaseFactorReal*currentFdVectorImag[nn+offset];
+							        b0Imag += phaseFactorImag*currentFdVectorReal[nn+offset];
+									
+							//assign to memory
+							        currentFdVectorReal[nn+offset] = currentFdVectorReal[nn] - b0Real;
+							        currentFdVectorImag[nn+offset] = currentFdVectorImag[nn] - b0Imag;
+							
+							currentFdVectorReal[nn]        = currentFdVectorReal[nn] + b0Real;
+							currentFdVectorImag[nn]			= currentFdVectorImag[nn] + b0Imag;
+							kk += phaseFactorInc;
+						}//nn
+					}//index
+					//if (twoPowerLevel==N) {
+					//	System.out.println("break in startAqc");
+					//	break;
+					//}
+				}//pp
+	    		
+	    		/*
+		    	 *  apply time domain aliasing to rearrange tau indices correctly 
+		    	 *  (downsampling in frequency domain, but more accurate in time domain in our case)
+		    	 */
+		    	
+		    	float currentRFDTimesNMaximum = 0;
+		    	int maxTauIndexFd = 0;
+		    	int ii;
+		    	for (ii = 0; ii <nrOfSamples; ii++) { 
+		    		//aliasing: add up what should have been wrapped
+		    		currentFdVectorReal[ii] += currentFdVectorReal[ii+nrOfSamples];
+		    		currentFdVectorImag[ii] += currentFdVectorImag[ii+nrOfSamples];
+		    		currentFdVectorReal[ii] /= N;
+		    		currentFdVectorImag[ii] /= N;
+		    		
+		    		float tmp  = currentFdVectorReal[ii]*currentFdVectorReal[ii];
+		    		float tmp2 = currentFdVectorImag[ii]*currentFdVectorImag[ii];
+		    		
+		    		if (tmp>currentRFDTimesNMaximum-tmp2) {
+		    			tmp = tmp+tmp2;
+		    			maxTauIndexFd = ii;
+		    			currentRFDTimesNMaximum = tmp;
+		    			
+		    		}// if abs^2 > currentMaximum
+		    	}// aliasing and local maximum detection
+		    	
+	    		maxTauIndices[fd] = maxTauIndexFd;
+	    		maxSignalPowersTimesN[fd] = currentRFDTimesNMaximum;
+	    	}//fd
+	    }//radix 2
+	    
+
 		
 		
 		/*
@@ -561,11 +707,63 @@ public class AcquisitionWIP {
 	    
 	    // assigments
 	    codeShift = maxTauIndex+1;
-	    System.out.println("maxFDIndex =" +maxFdIndex);
+	   
 	    dopplerShift = maxFdIndex*stepRate + minRate; 
-	    acqResult =  maxSignalPowerTimesN > pInTimesNrOfSamples*gamma*N*N; //division by N had been omitted in inverse FFT; this way, only needed once
+	    acqResult =  maxSignalPowerTimesN > pInTimesNrOfSamples*gamma; //division by N had been omitted in inverse FFT; this way, only needed once
 		return acqResult;
 	}//startAcquisition
+	
+	public static void printArraysOctaveFormat(String msg, boolean octave, float[] real, float[] imag) {
+		if (msg.length() ==0) return;
+		if(octave) {
+			System.out.println(msg);
+			String st = " = [";
+				for (int nn = 0; nn < real.length; nn++) {
+					st+= "("+real[nn] +" + "+imag[nn]+ "i)	 ";
+				}
+				st += "];";
+				System.out.println(st);
+		}
+		
+		else {
+			System.out.println(msg);
+			String st = "";
+			for (int nn = 0; nn < real.length; nn++) {
+				st= nn + " ("+real[nn] +" + "+imag[nn]+ "i)	 ";
+				System.out.println(st);
+
+			}
+			
+		}
+	}
+	
+	
+	public static void printArraysOctaveFormat(String msg, boolean octave, float[] abs) {
+		if (msg.length() !=0) return;
+			
+			
+			if(octave) {
+				//System.out.print(msg);
+				String st = msg+ "= [";
+					for (int nn = 0; nn < abs.length; nn++) {
+						st+= abs[nn]+ " ";
+					}
+					st += "];";
+					System.out.println(st);
+			}
+			
+			else {
+				System.out.println(msg);
+				String st = "";
+				for (int nn = 0; nn < abs.length; nn++) {
+					st= nn + " " + abs[nn];
+					System.out.println(st);
+
+				}
+				
+			}
+		}
+	
 	
 	/**
 	 * Computes the Radix-4 Decimation-in-Frequency FFT in an iterative way for the codes vector.
@@ -582,7 +780,7 @@ public class AcquisitionWIP {
 	     * approach, which would take bit-reverse index ordered input and produces natural ordered output.
 		 */
 		final int stages = nExponent2>>1; //log(2)/2
-		final float phaseFactorBase = -2*PI/N;
+		final float phaseFactorBase = minus2PI/N;
 		int M = N>>2; // M = N/4
 		
 		//outermost loop: recursion level
@@ -688,71 +886,11 @@ public class AcquisitionWIP {
 			} //index
 			M = M>>2;
 		}//p = recursionLevel
-		
-		//printArraysOctaveFormat("dif-fft of codes:", codesDFTReal, codesDFTImag);
 	}//computeCodesDFTIterativelyRadix4
-
-	public void conjCodes(float divFactor) {
-		for (int nn = 0; nn < N; nn++) {
-			codesDFTImag[nn] *= -1;
-			codesDFTReal[nn] /=divFactor;
-			codesDFTImag[nn] /= divFactor;
-		}
-	}
-	
-	public static void printArraysOctaveFormat(String msg, boolean octave, float[] real, float[] imag) {
-		if (msg.length() !=0) return;
-		if(octave) {
-			System.out.println(msg);
-			String st = " = [";
-				for (int nn = 0; nn < real.length; nn++) {
-					st+= "("+real[nn] +" + "+imag[nn]+ "i)	 ";
-				}
-				st += "];";
-				System.out.println(st);
-		}
-		
-		else {
-			System.out.println(msg);
-			String st = "";
-			for (int nn = 0; nn < real.length; nn++) {
-				st= nn + " ("+real[nn] +" + "+imag[nn]+ "i)	 ";
-				System.out.println(st);
-
-			}
-			
-		}
-	}
-	
-public static void printArraysOctaveFormat(String msg, boolean octave, float[] abs) {
-	if (msg.length() !=0) return;
-		
-		
-		if(octave) {
-			//System.out.print(msg);
-			String st = msg+ "= [";
-				for (int nn = 0; nn < abs.length; nn++) {
-					st+= abs[nn]+ " ";
-				}
-				st += "];";
-				System.out.println(st);
-		}
-		
-		else {
-			System.out.println(msg);
-			String st = "";
-			for (int nn = 0; nn < abs.length; nn++) {
-				st= nn + " " + abs[nn];
-				System.out.println(st);
-
-			}
-			
-		}
-	}
 	
 	/**
 	 * For Testing the inverse DIT approach
-	 * Computes the inverse FFT (without scaling 1/N) of the codes vector with an iterative Decimation-in-Time radix-4
+	 * Computes the FFT (without scaling 1/N) of the codes vector with an iterative Decimation-in-Time radix-4
 	 * approach. 
 	 */
 	public void computeCodesDFTIterativelyRadix4DIT() {
@@ -779,7 +917,7 @@ public static void printArraysOctaveFormat(String msg, boolean octave, float[] a
 			final int offset2 = offset<<1; //offset*2;
 			final int offset3 = 3*offset; //offset *3;
 			
-			final int phaseFactorInc = N/fourPowerLevel; //TODO exchange with shifts
+			final int phaseFactorInc = (N>>((pp<<1)+2)); ; //TODO exchange with shifts
 			for (int index = 0; index < N; index+=fourPowerLevel) {
 				int kk = 0;
 				for (int nn = index; nn < index+offset; nn++) {
@@ -858,72 +996,103 @@ public static void printArraysOctaveFormat(String msg, boolean octave, float[] a
 		//printArraysOctaveFormat("codes after DIT", codesDFTReal, codesDFTImag);
 	}//computeCodesDFTIterativelyRadix4DIT
 	   
-	public void compareCodes() {
-		float byN = 1/N;
+
+	/**
+	 * Computes the DFT as Radix-2-FFT, iterative, as a Decimation-in-Frequency approach.
+	 */
+	public void computeCodesDFTIterativelyRadix2DIF() {
+		final int stages = nExponent2Final;
+		final float phaseFactorExp = minus2PI/N;
 		
-		//aliasing ? 
-		//for (int nn=0; nn < nrOfSamples-1; nn++) {
-		//	codesDFTReal[nn] +=codesDFTReal[nn+nrOfSamples];
-		//	codesDFTImag[nn] +=codesDFTImag[nn+nrOfSamples];
-		//}
-		//for (int nn = 0; nn < N; nn++) {
-		//	float realDiff = codesDFTReal[nn] - codesRefReal[nn];
-		//	float imagDiff = codesDFTImag[nn] - codesRefImag[nn];
-		//	String line = nn+ ":\tref: ("+codesRefReal[nn]+","+codesRefImag[nn]+")  \t computed:("+codesDFTReal[nn]+","+codesDFTImag[nn]+")\t diff: ("+realDiff+","+imagDiff+")";
-		//	//String line = codesDFTReal[nn] + " + "+ codesDFTImag[nn]+"i";
-		//	System.out.println(line);
-		//}
-	}
-	
-	public void computeCodesDFTIteratively() {
-		
-		// update according to butterfly
-		int p = 1;
-		for (int ii = 2; ii <=N; ii*=2) { 
-			final int halfII = ii<<1;
-			final float phaseConst = -2*(1/ii)*PI; 
-			//for kk=0, skip long computation of phase
-			final int nByII = N>>p;
-			p++;
+		for (int pp = 0; pp < stages; pp++) {
+			final int twoPowerLevel = 1<<(pp);
+			final int halfsize = N>>(pp+1);
+			final int size = N>>(pp);
 			
-			
-			//then, the original loop
-			final int iiBy2 = ii<<1;
-			for (int kk = 0; kk < iiBy2; kk++) {
-				
-				//compute phase
-				final float phase = phaseConst*kk;
-				final float phaseReal = PETrigonometry.cos(phase);
-				final float phaseImag = PETrigonometry.sin(phase);
-				
-				for (int jj = 0; jj < nByII; jj++) {
-					float tmpReal = codesDFTReal[jj*ii+kk+halfII];
-					float tmpImag = codesDFTImag[jj*ii+kk+halfII];
+			for (int index = 0; index < twoPowerLevel; index++) {
+				final int beginKK = index*size;
+				final int endKK = beginKK+halfsize;
+				int phaseFactorInc = 0;
+				for (int nn = beginKK; nn < endKK; nn++) {
+					 
 					
-					float realAcc1 = tmpReal*phaseReal;
-					float imagAcc1 = tmpReal*phaseImag;
-					float realAcc2 = tmpImag*phaseImag;
-					float imagAcc2 = tmpImag*phaseReal;
-					//final +- assignment
-					float aReal = codesDFTReal[jj*ii+kk]-realAcc1; 
-				    float aImag = codesDFTImag[jj*ii+kk]-imagAcc1; 
-					aReal +=realAcc2;
-					aImag -= imagAcc2;
-					codesDFTReal[jj*ii + kk + halfII] = aReal;
-					codesDFTImag[jj*ii + kk+ halfII]  = aImag;
+					final float tmpReal = codesDFTReal[nn];
+					final float tmpImag = codesDFTImag[nn];
 					
-					codesDFTReal[jj*ii + kk] +=realAcc1;
-					codesDFTImag[jj*ii + kk] +=imagAcc1; 
-					codesDFTReal[jj*ii + kk] -=realAcc2;
-					codesDFTImag[jj*ii + kk] +=imagAcc2; 
-				}
-			}
-		}
-	}	//codesDFT
+					final float phaseFactor = phaseFactorInc*phaseFactorExp;
+					final float phaseFactorReal = PETrigonometry.cos(phaseFactor);
+					final float phaseFactorImag = PETrigonometry.sin(phaseFactor);
+					
+					//System.out.println("twiddlefactor = "+phaseFactorReal+" + "+phaseFactorImag+"i)");
+					
+					final float a0Real = tmpReal - codesDFTReal[nn+halfsize];
+					final float a0Imag = tmpImag - codesDFTImag[nn+halfsize];
+					
+					float b0Real  = a0Real*phaseFactorReal;
+						  b0Real -= a0Imag*phaseFactorImag;
+						  
+					float b0Imag  = a0Imag*phaseFactorReal;
+					      b0Imag += a0Real*phaseFactorImag;
+					
+					//assignments to memory
+					codesDFTReal[nn] = tmpReal + codesDFTReal[nn+halfsize];
+					codesDFTImag[nn] = tmpImag + codesDFTImag[nn+halfsize];
+					
+					codesDFTReal[nn+halfsize] = b0Real;
+					codesDFTImag[nn+halfsize] = b0Imag;
+					
+					phaseFactorInc += twoPowerLevel;
+				}//nn
+			}// index
+		}//pp
+	}	//computeCodesDFTIterativelyRadix2DIF
 
 	
-	
-	
+	/**
+	 * For Testing the inverse DIT approach
+	 * Computes the FFT (without scaling 1/N) of the codes vector with an iterative Decimation-in-Time radix-2
+	 * approach. 
+	 */
+	public void computeCodesDFTIterativelyRadix2DIT() {
+		final int stages = nExponent2Final;
+		final float phaseFactorBase = minus2PI/N;
+		
+		for (int pp = 0; pp < stages; pp++) {
+			final int twoPowerLevel = 2<<(pp);
+			final int offset = 1<<(pp);
+			
+			final int phaseFactorInc = (N>>(pp+1));
+			for (int index = 0; index < N; index += twoPowerLevel) {
+				int kk = 0;
+				for (int nn = index; nn < index+offset; nn++) {
+					//angle
+					final float phaseFactor  = phaseFactorBase*kk;
+					
+					//phase factor values re, im
+					final float phaseFactorReal = PETrigonometry.cos(phaseFactor);
+					final float phaseFactorImag = PETrigonometry.sin(phaseFactor);
+					
+					//multiply with phase factor
+					  float b0Real  = phaseFactorReal*codesDFTReal[nn+offset];
+							b0Real -= phaseFactorImag*codesDFTImag[nn+offset];
+							
+					  float b0Imag  = phaseFactorReal*codesDFTImag[nn+offset];
+					        b0Imag += phaseFactorImag*codesDFTReal[nn+offset];
+							
+					//assign to memory
+				    codesDFTReal[nn+offset] = codesDFTReal[nn] - b0Real;
+					codesDFTImag[nn+offset] = codesDFTImag[nn] - b0Imag;
+					
+					codesDFTReal[nn]        = codesDFTReal[nn] + b0Real;
+					codesDFTImag[nn]		= codesDFTImag[nn] + b0Imag;
+					kk += phaseFactorInc;
+				}//nn
+			}//index
+			//if (twoPowerLevel==N) {
+			//	break;
+			//}
+		}//pp
+	}//computeCodesDFTIterativelyRadix2DIT
 	
 /*
  * Getters for the output data

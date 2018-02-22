@@ -13,7 +13,7 @@ public class AcquisitionTest {
 
 		AcquisitionWIP acq = null;
 		
-		int testNr = 1;
+		int testNr = 6;
 
 		
 		String Nr = Integer.toString(testNr);
