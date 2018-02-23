@@ -1,0 +1,14 @@
+\BOOKMARK [0][-]{chapter.1}{Introduction}{}% 1
+\BOOKMARK [1][-]{section.1.1}{Original Algorithm}{chapter.1}% 2
+\BOOKMARK [0][-]{chapter.2}{Mathematical Optimizations}{}% 3
+\BOOKMARK [1][-]{section.2.1}{Frequency Shifting}{chapter.2}% 4
+\BOOKMARK [1][-]{section.2.2}{Cross-Correlation with Fast-Fourier Transforms}{chapter.2}% 5
+\BOOKMARK [1][-]{section.2.3}{Chosing the FFT Implementation}{chapter.2}% 6
+\BOOKMARK [0][-]{chapter.3}{Code Style Optimizations}{}% 7
+\BOOKMARK [0][-]{chapter.4}{Composition Optimization}{}% 8
+\BOOKMARK [1][-]{section.4.1}{Performance Adaption of CGRA Compositions}{chapter.4}% 9
+\BOOKMARK [1][-]{section.4.2}{Energy-Consumption Optimizations of CGRA Compositions}{chapter.4}% 10
+\BOOKMARK [0][-]{chapter.5}{Evaluation}{}% 11
+\BOOKMARK [1][-]{section.5.1}{Performance Optimization}{chapter.5}% 12
+\BOOKMARK [1][-]{section.5.2}{Energy Consumption Minimization}{chapter.5}% 13
+\BOOKMARK [0][-]{chapter.6}{Bibliography}{}% 14

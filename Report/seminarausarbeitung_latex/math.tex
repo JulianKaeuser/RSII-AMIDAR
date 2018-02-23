@@ -1,0 +1,127 @@
+\chapter{Mathematical Optimizations}
+\label{cha:mathematicalOptimizations}
+
+In this chapter, the applied mathematical conversions are presented.
+
+\section{Frequency Shifting}
+\label{sec:frequencyShifting}
+
+For each of the target frequencies to examine, the sample vector $f_{d}(n)$ is multiplied by a complex factor $e^{-j2\pi nf_{d}/f_{s}}$. No mathematical expression, which improves this multiplication, is applied. In the following, the term $f_{d}$ regards this multiplied vector for the sake of readability.
+
+\section{Cross-Correlation with Fast-Fourier Transforms}
+\label{sec:crossCorrByFFT}
+
+The kernel of the acquisition algorithm is the computation of the cross-correlation $R$ between the vector $f_{d}(n)$ and the code vector $c(n)$:
+
+\begin{equation}
+    R_{f_{d}, c}(n) &= f_{d}(n) \star c(n)
+\end{equation}
+
+The cross-correlation can be expressed in the terms of the \emph{circular convolution} in the time domain:
+
+\begin{equation}
+    R_{f_{d}, c}(n) &= f_{d}(n) \circledast c(-n)
+\end{equation}
+
+Note that the operation $c(-n)$ equals the order-reversal of the vector $c(n)$.
+In the frequency domain, the circular convolution resembles the element-wise product of the Fourier-transforms of the arguments:
+
+\begin{equation}
+    f_{d}(n) \circledast c(n) \fourier F_{d}(k) \cdot C(k)
+\end{equation}
+
+If this conversion is used to compute the cross-correlation of the two vectors, both vectors have to be Fourier-transformed. Then, their element-wise product must be inverse-Fourier-transformed. In our case, all convolutions and transforms are realized discretely. Hence, the Fourier transform must be realized as DFT and IDFT, respectively. 
+
+For the discrete forward- and inverse Fourier transformation as well as the discrete convolution, the algorithmic complexity is in general $\mathcal{O}(N^{2})$, where $N$ is the length of the input vectors. This means that the number of basic operations (in our case, complex multiplications and additions of floating point values) scales quadratically in magnitude with the length of the signal and code vectors. If this complexity can be reduced, a lot of computations may be avoided, promising a runtime speedup.
+
+In out solution, an approach to reduce the $\mathcal{O}(N^{2})$ complexity at the cost of artificial extension of the input vectors is used. It is based on the characteristic of \emph{Fast Fourier Transforms}(FFT), which allow a complexity of $\mathcal{O}(N\log{}N)$.
+
+FFTs typically require input vectors of a length $N = 2^{k}$\footnote{There are implementations for basically every N, but these often require a knowledge about the length before the runtime or include recursion, which is badly suited in out case}, which is not given in general in this task. Therefore, a solution to be able to make use of these transforms for arbitrarily length input vectors is necessary.
+
+The formula for the discrete circular convolution is given by \ref{eqn:circularConv}:
+
+\begin{equation}
+    a(n) \circledast b(n) &= \sum_{k=0}^{N-1}a(k)\cdot b((n-k)\; mod\; N)\qquad \forall n \in N
+    \label{eqn:circularConv}
+\end{equation}
+
+As the formula shows, the resulting vector has a length of N. The \emph{linear} convolution of two vectors $a(n) \ast b(n)$ generally results in a length $L_{lin} = L_{a} + L_{b} - 1$, where $L_{x}$ is the length of vector $x$. If equations \ref{eqn:aTick} and \ref{eqn:bTick} are fulfilled,
+
+\begin{equation}
+    a'(n) &= \begin{cases}
+        a(n) & n \in 0 ... L_{a}-1\\
+        0    & n \in L_{a} ... L_{a}+L_{b}-1
+    \end{cases}
+    \label{eqn:aTick}
+\end{equation}
+
+\begin{equation}
+    b'(n) &= \begin{cases}
+        b(n) & n \in 0 ... L_{b}-1\\
+        0    & n \in L_{b} ... L_{a}+L_{b}-1
+    \end{cases}
+    \label{eqn:bTick}
+\end{equation}
+
+the linear convolution of $a'(n)$ and $b'(n)$ and their circular convolution are equal:
+
+\begin{equation}
+    a'(n) \ast b'(n) &\stackrel{!}{=}  a'(n) \circledast b'(n)
+\end{equation}
+
+In that case, the transform relation $\mathscr{F}^{-1}\{\mathscr{F}\{a'(n)\}\cdot\mathscr{F}\{b'(n)\}\}$ equals the linear convolution.
+
+The conversion applied in equations \ref{eqn:aTick} and \ref{eqn:bTick} are a \emph{zero-padding} of the vectors in the time domain. The vector length is extended, whereas no information is added. This equals a over-sampling in the frequency domain: the resulting spectrum is interpolated from the original spectrum. Oversampling in one of the two domains can always be reverted by applying \emph{aliasing} in the other domain. Aliasing is the process of wrapping components with an index $K+l$ higher than a threshold index $K$ over and adding them up to the first $l$ original samples:
+\begin{equation}
+    \tilde{y}(n) &= \sum_{r=-\infty}^{\infty}y(n+rN)
+\end{equation}
+
+The $\infty$ expressions may be replaced with borders $0$ and $1$, because the values of $y(n)$ are $0$ for negative indices and indices larger than $2N-1$.
+
+Therefore, the circular convolution of two vectors $a(n)$ and $b(n)$ can be expressed as the linear convolution of the zero-padded vectors $a'(n)$ and $b'(n)$, followed by an aliasing:
+
+\begin{equation}
+    a(n) \circledast b(n) &\stackrel{!}{=} \text{alias}\left(a'(n) \ast b'(n) \right) 
+    \label{eqn:aliasConvo}
+\end{equation}
+
+The only requirement for equation \ref{eqn:aliasConvo} is that the vectors $a'(n)$ and $b'(n)$ are padded to at least length $L_{lin} = L_{a} + L_{b} - 1$.
+
+As one can see, the realtion given by equation \ref{eqn:aliasConvo} allows the use of vectors extended to a length $N'$, which has only a lower bound, to compute the circular convolution of two vectors. Hence, the length $N'$ can be chosen such that $N' = 2^{k}, k \in \mathbb{N}$. This allows the use of classical FFT algorithms to find the circular convolution of arbitrarily sized input vectors:
+
+\begin{equation}
+    a(n) \circledast b(n) &= \text{alias}\left(\text{IFFT}\left( \text{FFT}(a'(n)) \cdot \text{FFT}(b'(n))\right)\right)
+\end{equation}
+
+, where
+
+\begin{equation}
+    L_{a'(n)} = L_{b'(n)} &= \text{min}(2^{k})\geq L_{a(n)}+L_{b(n)}-1, \; k \in \mathbb{N}
+\end{equation}
+
+
+Of course, this approach is of complexity $\mathcal{O}(N'\log{}N')$, but with $N'$ at least twice as large as the original length for a $\mathcal{O}(N^{2})$ circular convolution or IDFT-DFT approach. In the worst case, the original length is $N_{original} = 2^{k}+1$, so that the the difference in length is maximal. Nevertheless, for larger lengths of the input vectors, the converted approach may save a significant amount of operations compared with the $N^{2}$ complexity convolution.
+
+\section{Chosing the FFT Implementation}
+\label{sec:chosingFFT}
+
+For input lengths $N = 2^{k}$, the Cooley-Tukey-Algorithm provides a fast and proven implementation for FFTs. The original algorithm is recursive; it is available as iterative algorithm, which is favored for the AMIDAR processor, since loops can be accelerated on the CGRA. For input vector which force the length $N'$ to be a even power of two, the radix-4 variant of the Cooley-Tukey-Algorithm can be used. A radix-4 implementation saves 25\% of complex multiplications compared to the radix-2 variant. In uneven cases, the classical radix-2 variant must be used. 
+
+Both FFT variants include a bit-reversed index reordering of the input samples. This means that the new index of a samples, after the reordering, equals the bit-reversed old index:
+
+\begin{align*}
+    \text{index}_{old} &= \sum_{k=0}^{N} a_{k}2^{k}\\
+    \text{index}_{new} &= \sum_{k=0}^{N} a_{N-k}2^{k}
+\end{align*}
+
+A reordering in that manner requires non-sequential array accesses, which are usually not efficient regarding the cache performance. As the order of the output of the FFT is not relevant for the element-wise multiplication, the reordering is only be required due to the inverse FFT. Nevertheless, there are two other distinct FFT techniques, which differ in the order of the multiplication with the $e$ terms: \emph{Decimation-in-Time} (DIT) and \emph{Decimation-in-Frequency} (DIF). DIT-FFTs require a bit-reverse index ordered input and produce natural-ordered output; DIF-FFTs require a natural-ordered input and produce bit-reverse index ordered output. If the FFT of codes and the samples are transformed into the frequency domain by a DIF-FFT and transformed back to the time domain by a DIT-FFT, no reordering is required at all. Hence, 4 different types of FFT are implemented:
+
+\begin{enumerate}
+    \item DIF-Radix-2 forward FFT for uneven powers of two as input length, for the transform of codes and samples to the frequency domain
+    \item DIT-Radix-2 forward FFT for uneven powers of two as input length, for the transform of the element-wise product to the time domain
+    \item DIF-Radix-4 forward FFT for even powers of two as input length, for the transform of codes and samples to the frequency domain
+    \item DIT-Radix-4 forward FFT for even powers of two as input length, for the transform of the element-wise product to the time domain
+\end{enumerate}
+
+The inverse FFTs can be implemented as a forward FFT, preceded and succeeded by a complex conjugation of the input and output. The second complex conugation can be omitted because it does not make a difference for the succeeding maximum value examination.
+
