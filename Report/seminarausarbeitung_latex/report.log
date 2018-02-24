@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.14159265-2.6-1.40.18 (TeX Live 2017/Arch Linux) (preloaded format=pdflatex 2017.12.30)  23 FEB 2018 14:41
+This is pdfTeX, Version 3.14159265-2.6-1.40.18 (TeX Live 2017/Arch Linux) (preloaded format=pdflatex 2017.12.30)  24 FEB 2018 09:20
 entering extended mode
  restricted \write18 enabled.
  file:line:error style messages enabled.
@@ -1195,41 +1195,92 @@ Package uniquecounter Info: New unique counter `rerunfilecheck' on input line 2
 (/usr/share/texmf-dist/tex/latex/tools/enumerate.sty
 Package: enumerate 2015/07/23 v3.00 enumerate extensions (DPC)
 \@enLab=\toks45
+)
+(/usr/share/texmf-dist/tex/latex/algorithm2e/algorithm2e.sty
+Package: algorithm2e 2017/07/18 v5.2 algorithms environments
+\c@AlgoLine=\count154
+\algocf@hangindent=\skip129
+
+(/usr/share/texmf-dist/tex/latex/ifoddpage/ifoddpage.sty
+Package: ifoddpage 2016/04/23 v1.1 Conditionals for odd/even page detection
+\c@checkoddpage=\count155
+)
+(/usr/share/texmf-dist/tex/latex/tools/xspace.sty
+Package: xspace 2014/10/28 v1.13 Space after command names (DPC,MH)
+)
+(/usr/share/texmf-dist/tex/latex/relsize/relsize.sty
+Package: relsize 2013/03/29 ver 4.1
+)
+\skiptotal=\skip130
+\skiplinenumber=\skip131
+\skiprule=\skip132
+\skiphlne=\skip133
+\skiptext=\skip134
+\skiplength=\skip135
+\algomargin=\skip136
+\skipalgocfslide=\skip137
+\algowidth=\dimen259
+\inoutsize=\dimen260
+\inoutindent=\dimen261
+\interspacetitleruled=\dimen262
+\interspacealgoruled=\dimen263
+\interspacetitleboxruled=\dimen264
+\algocf@ruledwidth=\skip138
+\algocf@inoutbox=\box71
+\algocf@inputbox=\box72
+\AlCapSkip=\skip139
+\AlCapHSkip=\skip140
+\algoskipindent=\skip141
+\algocf@nlbox=\box73
+\algocf@hangingbox=\box74
+\algocf@untilbox=\box75
+\algocf@skipuntil=\skip142
+\algocf@capbox=\box76
+\algocf@lcaptionbox=\skip143
+\algoheightruledefault=\skip144
+\algoheightrule=\skip145
+\algotitleheightruledefault=\skip146
+\algotitleheightrule=\skip147
+\c@algocfline=\count156
+\c@algocfproc=\count157
+\c@algocf=\count158
+\algocf@algoframe=\box77
+\algocf@algobox=\box78
 ) (./report.aux
 (./introduction.aux) (./math.aux) (./code.aux) (./composition.aux)
 (./evaluation.aux))
 \openout1 = `report.aux'.
 
-LaTeX Font Info:    Checking defaults for OML/cmm/m/it on input line 61.
-LaTeX Font Info:    ... okay on input line 61.
-LaTeX Font Info:    Checking defaults for T1/cmr/m/n on input line 61.
-LaTeX Font Info:    ... okay on input line 61.
-LaTeX Font Info:    Checking defaults for OT1/cmr/m/n on input line 61.
-LaTeX Font Info:    ... okay on input line 61.
-LaTeX Font Info:    Checking defaults for OMS/cmsy/m/n on input line 61.
-LaTeX Font Info:    ... okay on input line 61.
-LaTeX Font Info:    Checking defaults for OMX/cmex/m/n on input line 61.
-LaTeX Font Info:    ... okay on input line 61.
-LaTeX Font Info:    Checking defaults for U/cmr/m/n on input line 61.
-LaTeX Font Info:    ... okay on input line 61.
-LaTeX Font Info:    Checking defaults for TS1/cmr/m/n on input line 61.
-LaTeX Font Info:    ... okay on input line 61.
-LaTeX Font Info:    Checking defaults for MDA/cmr/m/n on input line 61.
-LaTeX Font Info:    Try loading font information for MDA+cmr on input line 61.
+LaTeX Font Info:    Checking defaults for OML/cmm/m/it on input line 64.
+LaTeX Font Info:    ... okay on input line 64.
+LaTeX Font Info:    Checking defaults for T1/cmr/m/n on input line 64.
+LaTeX Font Info:    ... okay on input line 64.
+LaTeX Font Info:    Checking defaults for OT1/cmr/m/n on input line 64.
+LaTeX Font Info:    ... okay on input line 64.
+LaTeX Font Info:    Checking defaults for OMS/cmsy/m/n on input line 64.
+LaTeX Font Info:    ... okay on input line 64.
+LaTeX Font Info:    Checking defaults for OMX/cmex/m/n on input line 64.
+LaTeX Font Info:    ... okay on input line 64.
+LaTeX Font Info:    Checking defaults for U/cmr/m/n on input line 64.
+LaTeX Font Info:    ... okay on input line 64.
+LaTeX Font Info:    Checking defaults for TS1/cmr/m/n on input line 64.
+LaTeX Font Info:    ... okay on input line 64.
+LaTeX Font Info:    Checking defaults for MDA/cmr/m/n on input line 64.
+LaTeX Font Info:    Try loading font information for MDA+cmr on input line 64.
  (/usr/share/texmf-dist/tex/latex/mathdesign/mdacmr.fd
 File: mdacmr.fd 
 )
-LaTeX Font Info:    ... okay on input line 61.
-LaTeX Font Info:    Checking defaults for MDB/cmr/m/n on input line 61.
-LaTeX Font Info:    Try loading font information for MDB+cmr on input line 61.
+LaTeX Font Info:    ... okay on input line 64.
+LaTeX Font Info:    Checking defaults for MDB/cmr/m/n on input line 64.
+LaTeX Font Info:    Try loading font information for MDB+cmr on input line 64.
 
 (/usr/share/texmf-dist/tex/latex/mathdesign/mdbcmr.fd
 File: mdbcmr.fd 
 )
-LaTeX Font Info:    ... okay on input line 61.
-LaTeX Font Info:    Checking defaults for PD1/pdf/m/n on input line 61.
-LaTeX Font Info:    ... okay on input line 61.
-LaTeX Font Info:    Try loading font information for T1+5ch on input line 61.
+LaTeX Font Info:    ... okay on input line 64.
+LaTeX Font Info:    Checking defaults for PD1/pdf/m/n on input line 64.
+LaTeX Font Info:    ... okay on input line 64.
+LaTeX Font Info:    Try loading font information for T1+5ch on input line 64.
 
 (/home/juliankaeuser/texmf/tex/latex/tudfonts-tex_0.0.20090806/texmf/tex/latex/
 tex-tudfonts/softmake/charter/t15ch.fd
@@ -1237,16 +1288,16 @@ File: t15ch.fd 2008/06/23 Fontinst v1.927 font definitions for T1/5ch.
 )
 (/usr/share/texmf-dist/tex/context/base/mkii/supp-pdf.mkii
 [Loading MPS to PDF converter (version 2006.09.02).]
-\scratchcounter=\count154
-\scratchdimen=\dimen259
-\scratchbox=\box71
-\nofMPsegments=\count155
-\nofMParguments=\count156
+\scratchcounter=\count159
+\scratchdimen=\dimen265
+\scratchbox=\box79
+\nofMPsegments=\count160
+\nofMParguments=\count161
 \everyMPshowfont=\toks46
-\MPscratchCnt=\count157
-\MPscratchDim=\dimen260
-\MPnumerator=\count158
-\makeMPintoPDFobject=\count159
+\MPscratchCnt=\count162
+\MPscratchDim=\dimen266
+\MPnumerator=\count163
+\makeMPintoPDFobject=\count164
 \everyMPtoPDFconversion=\toks47
 ) (/usr/share/texmf-dist/tex/latex/oberdiek/epstopdf-base.sty
 Package: epstopdf-base 2016/05/15 v2.6 Base part for package epstopdf
@@ -1266,19 +1317,19 @@ File: epstopdf-sys.cfg 2010/07/13 v1.3 Configuration of (r)epstopdf for TeX Liv
 e
 ))
 /home/juliankaeuser/Dokumente/Studium2/Rechnersysteme2/Uebungen/Uebung2/AmidarR
-S2/amidar-sim2/Report/seminarausarbeitung_latex/report.tex:61: You can't use a 
+S2/amidar-sim2/Report/seminarausarbeitung_latex/report.tex:64: You can't use a 
 prefix with `\begingroup'.
 <to be read again> 
                    \begingroup 
-l.61 \begin{document}
+l.64 \begin{document}
                      
 I'll pretend you didn't say \long or \outer or \global or \protected.
 
 
 Package mathdesign/mdbch Warning: Package 'mathrsfs' shouldn't be used in conjo
-nction with package mdbch, on input line 61.
+nction with package mdbch, on input line 64.
 
-\AtBeginShipoutBox=\box72
+\AtBeginShipoutBox=\box80
 *geometry* detected driver: dvips
 *geometry* verbose mode - [ preamble ] result:
 * driver: dvips
@@ -1312,8 +1363,8 @@ nction with package mdbch, on input line 61.
 * \@reversemarginfalse
 * (1in=72.27pt=25.4mm, 1cm=28.453pt)
 
-\TUD@part@topskip=\skip129
-LaTeX Info: Redefining \microtypecontext on input line 61.
+\TUD@part@topskip=\skip148
+LaTeX Info: Redefining \microtypecontext on input line 64.
 Package microtype Info: Generating PDF output.
 Package microtype Info: Character protrusion enabled (level 2).
 Package microtype Info: Using default protrusion set `alltext'.
@@ -1328,7 +1379,7 @@ Package microtype Info: Loading generic protrusion settings for font family
 (microtype)             For optimal results, create family-specific settings.
 (microtype)             See the microtype manual for details.
 ABD: EveryShipout initializing macros
-Package hyperref Info: Link coloring OFF on input line 61.
+Package hyperref Info: Link coloring OFF on input line 64.
 
 (/usr/share/texmf-dist/tex/latex/hyperref/nameref.sty
 Package: nameref 2016/05/21 v2.44 Cross-referencing by name of section
@@ -1336,39 +1387,39 @@ Package: nameref 2016/05/21 v2.44 Cross-referencing by name of section
 (/usr/share/texmf-dist/tex/generic/oberdiek/gettitlestring.sty
 Package: gettitlestring 2016/05/16 v1.5 Cleanup title references (HO)
 )
-\c@section@level=\count160
+\c@section@level=\count165
 )
-LaTeX Info: Redefining \ref on input line 61.
-LaTeX Info: Redefining \pageref on input line 61.
-LaTeX Info: Redefining \nameref on input line 61.
+LaTeX Info: Redefining \ref on input line 64.
+LaTeX Info: Redefining \pageref on input line 64.
+LaTeX Info: Redefining \nameref on input line 64.
  (./report.out) (./report.out)
 \@outlinefile=\write4
 \openout4 = `report.out'.
 
-\@TUD@tmp@baselineskip=\skip130
-\@TUD@tmp@parwidth=\skip131
-\TUD@titleboxheight=\skip132
-\TUD@titleboxdepth=\skip133
-\TUD@subtitleboxheight=\skip134
-\TUD@subtitleboxdepth=\skip135
-\TUD@logoboxheight=\skip136
-\TUD@logoboxwidth=\skip137
-\TUD@colorbackheight=\skip138
-\TUD@colorbacktitleheight=\skip139
-\TUD@instboxheight=\skip140
-\TUD@instboxdepth=\skip141
-\TUD@instboxwidth=\skip142
-\TUD@instlogoheight=\skip143
-\TUD@instlogowidth=\skip144
-\TUD@sponsorheight=\skip145
-\TUD@titlebox=\box73
-\TUD@subtitlebox=\box74
-\TUD@logobox=\box75
-\TUD@instbox=\box76
-\TUD@sponsorbox=\box77
-\TUD@tmp@height=\skip146
-\TUD@tmp@depth=\skip147
-LaTeX Font Info:    Try loading font information for T1+5fp on input line 65.
+\@TUD@tmp@baselineskip=\skip149
+\@TUD@tmp@parwidth=\skip150
+\TUD@titleboxheight=\skip151
+\TUD@titleboxdepth=\skip152
+\TUD@subtitleboxheight=\skip153
+\TUD@subtitleboxdepth=\skip154
+\TUD@logoboxheight=\skip155
+\TUD@logoboxwidth=\skip156
+\TUD@colorbackheight=\skip157
+\TUD@colorbacktitleheight=\skip158
+\TUD@instboxheight=\skip159
+\TUD@instboxdepth=\skip160
+\TUD@instboxwidth=\skip161
+\TUD@instlogoheight=\skip162
+\TUD@instlogowidth=\skip163
+\TUD@sponsorheight=\skip164
+\TUD@titlebox=\box81
+\TUD@subtitlebox=\box82
+\TUD@logobox=\box83
+\TUD@instbox=\box84
+\TUD@sponsorbox=\box85
+\TUD@tmp@height=\skip165
+\TUD@tmp@depth=\skip166
+LaTeX Font Info:    Try loading font information for T1+5fp on input line 68.
 
 (/home/juliankaeuser/texmf/tex/latex/tudfonts-tex_0.0.20090806/texmf/tex/latex/
 tex-tudfonts/softmake/frontpage/t15fp.fd
@@ -1379,154 +1430,154 @@ Package microtype Info: Loading generic protrusion settings for font family
 (microtype)             For optimal results, create family-specific settings.
 (microtype)             See the microtype manual for details.
 LaTeX Font Info:    Font shape `T1/5fp/b/n' in size <36> not available
-(Font)              Font shape `T1/5fp/mb/n' tried instead on input line 65.
-LaTeX Font Info:    Try loading font information for OT1+mdbch on input line 65
+(Font)              Font shape `T1/5fp/mb/n' tried instead on input line 68.
+LaTeX Font Info:    Try loading font information for OT1+mdbch on input line 68
 .
 
 (/usr/share/texmf-dist/tex/latex/mathdesign/mdbch/ot1mdbch.fd
 File: ot1mdbch.fd 2013/08/29 Fontinst v1.933 font definitions for OT1/mdbch.
 )
 LaTeX Font Info:    Font shape `OT1/mdbch/m/n' will be
-(Font)              scaled to size 11.04007pt on input line 65.
+(Font)              scaled to size 11.04007pt on input line 68.
 
 (/usr/share/texmf-dist/tex/latex/microtype/mt-bch.cfg
 File: mt-bch.cfg 2007/03/03 v1.5 microtype config. file: Bitstream Charter (RS)
 
 )
 LaTeX Font Info:    Font shape `OT1/mdbch/m/n' will be
-(Font)              scaled to size 7.68005pt on input line 65.
+(Font)              scaled to size 7.68005pt on input line 68.
 LaTeX Font Info:    Font shape `OT1/mdbch/m/n' will be
-(Font)              scaled to size 6.62404pt on input line 65.
-LaTeX Font Info:    Try loading font information for OML+mdbch on input line 65
+(Font)              scaled to size 6.62404pt on input line 68.
+LaTeX Font Info:    Try loading font information for OML+mdbch on input line 68
 .
 
 (/usr/share/texmf-dist/tex/latex/mathdesign/mdbch/omlmdbch.fd
 File: omlmdbch.fd 2013/08/29 Fontinst v1.933 font definitions for OML/mdbch.
 )
 LaTeX Font Info:    Font shape `OML/mdbch/m/it' will be
-(Font)              scaled to size 11.04007pt on input line 65.
+(Font)              scaled to size 11.04007pt on input line 68.
 LaTeX Font Info:    Font shape `OML/mdbch/m/it' will be
-(Font)              scaled to size 7.68005pt on input line 65.
+(Font)              scaled to size 7.68005pt on input line 68.
 LaTeX Font Info:    Font shape `OML/mdbch/m/it' will be
-(Font)              scaled to size 6.62404pt on input line 65.
-LaTeX Font Info:    Try loading font information for OMS+mdbch on input line 65
+(Font)              scaled to size 6.62404pt on input line 68.
+LaTeX Font Info:    Try loading font information for OMS+mdbch on input line 68
 .
 
 (/usr/share/texmf-dist/tex/latex/mathdesign/mdbch/omsmdbch.fd
 File: omsmdbch.fd 2013/08/29 Fontinst v1.933 font definitions for OMS/mdbch.
 )
 LaTeX Font Info:    Font shape `OMS/mdbch/m/n' will be
-(Font)              scaled to size 11.04007pt on input line 65.
+(Font)              scaled to size 11.04007pt on input line 68.
 LaTeX Font Info:    Font shape `OMS/mdbch/m/n' will be
-(Font)              scaled to size 7.68005pt on input line 65.
+(Font)              scaled to size 7.68005pt on input line 68.
 LaTeX Font Info:    Font shape `OMS/mdbch/m/n' will be
-(Font)              scaled to size 6.62404pt on input line 65.
-LaTeX Font Info:    Try loading font information for OMX+mdbch on input line 65
+(Font)              scaled to size 6.62404pt on input line 68.
+LaTeX Font Info:    Try loading font information for OMX+mdbch on input line 68
 .
 
 (/usr/share/texmf-dist/tex/latex/mathdesign/mdbch/omxmdbch.fd
 File: omxmdbch.fd 2013/08/29 Fontinst v1.933 font definitions for OMX/mdbch.
 )
 LaTeX Font Info:    Font shape `OMX/mdbch/m/n' will be
-(Font)              scaled to size 11.04007pt on input line 65.
+(Font)              scaled to size 11.04007pt on input line 68.
 LaTeX Font Info:    Font shape `OMX/mdbch/m/n' will be
-(Font)              scaled to size 7.68005pt on input line 65.
+(Font)              scaled to size 7.68005pt on input line 68.
 LaTeX Font Info:    Font shape `OMX/mdbch/m/n' will be
-(Font)              scaled to size 6.62404pt on input line 65.
+(Font)              scaled to size 6.62404pt on input line 68.
 LaTeX Font Info:    Font shape `OML/mdbch/m/n' will be
-(Font)              scaled to size 11.04007pt on input line 65.
+(Font)              scaled to size 11.04007pt on input line 68.
 LaTeX Font Info:    Font shape `OML/mdbch/m/n' will be
-(Font)              scaled to size 7.68005pt on input line 65.
+(Font)              scaled to size 7.68005pt on input line 68.
 LaTeX Font Info:    Font shape `OML/mdbch/m/n' will be
-(Font)              scaled to size 6.62404pt on input line 65.
-LaTeX Font Info:    Try loading font information for MDA+mdbch on input line 65
+(Font)              scaled to size 6.62404pt on input line 68.
+LaTeX Font Info:    Try loading font information for MDA+mdbch on input line 68
 .
 
 (/usr/share/texmf-dist/tex/latex/mathdesign/mdbch/mdamdbch.fd
 File: mdamdbch.fd 2013/08/29 Fontinst v1.933 font definitions for MDA/mdbch.
 )
 LaTeX Font Info:    Font shape `MDA/mdbch/m/n' will be
-(Font)              scaled to size 11.04007pt on input line 65.
+(Font)              scaled to size 11.04007pt on input line 68.
 LaTeX Font Info:    Font shape `MDA/mdbch/m/n' will be
-(Font)              scaled to size 7.68005pt on input line 65.
+(Font)              scaled to size 7.68005pt on input line 68.
 LaTeX Font Info:    Font shape `MDA/mdbch/m/n' will be
-(Font)              scaled to size 6.62404pt on input line 65.
-LaTeX Font Info:    Try loading font information for MDB+mdbch on input line 65
+(Font)              scaled to size 6.62404pt on input line 68.
+LaTeX Font Info:    Try loading font information for MDB+mdbch on input line 68
 .
 
 (/usr/share/texmf-dist/tex/latex/mathdesign/mdbch/mdbmdbch.fd
 File: mdbmdbch.fd 2013/08/29 Fontinst v1.933 font definitions for MDB/mdbch.
 )
 LaTeX Font Info:    Font shape `MDB/mdbch/m/n' will be
-(Font)              scaled to size 11.04007pt on input line 65.
+(Font)              scaled to size 11.04007pt on input line 68.
 LaTeX Font Info:    Font shape `MDB/mdbch/m/n' will be
-(Font)              scaled to size 7.68005pt on input line 65.
+(Font)              scaled to size 7.68005pt on input line 68.
 LaTeX Font Info:    Font shape `MDB/mdbch/m/n' will be
-(Font)              scaled to size 6.62404pt on input line 65.
-LaTeX Font Info:    Try loading font information for OML+mdput on input line 65
+(Font)              scaled to size 6.62404pt on input line 68.
+LaTeX Font Info:    Try loading font information for OML+mdput on input line 68
 .
 
 (/usr/share/texmf-dist/tex/latex/mathdesign/mdput/omlmdput.fd
 File: omlmdput.fd 2013/08/29 Fontinst v1.933 font definitions for OML/mdput.
 )
 LaTeX Font Info:    Font shape `OML/mdput/m/it' will be
-(Font)              scaled to size 10.81003pt on input line 65.
+(Font)              scaled to size 10.81003pt on input line 68.
 LaTeX Font Info:    Font shape `OML/mdput/m/it' will be
-(Font)              scaled to size 7.52002pt on input line 65.
+(Font)              scaled to size 7.52002pt on input line 68.
 LaTeX Font Info:    Font shape `OML/mdput/m/it' will be
-(Font)              scaled to size 6.48601pt on input line 65.
-LaTeX Font Info:    Try loading font information for U+rsfs on input line 65.
+(Font)              scaled to size 6.48601pt on input line 68.
+LaTeX Font Info:    Try loading font information for U+rsfs on input line 68.
 
 (/usr/share/texmf-dist/tex/latex/jknapltx/ursfs.fd
 File: ursfs.fd 1998/03/24 rsfs font definition file (jk)
 )
 
 LaTeX Font Warning: Font shape `U/rsfs/m/n' in size <11.5> not available
-(Font)              size <12> substituted on input line 65.
+(Font)              size <12> substituted on input line 68.
 
-\@TUD@titlelines=\count161
-<tud_logo.pdf, id=63, pagebox=cropbox, 157.58875pt x 63.23625pt>
+\@TUD@titlelines=\count166
+<tud_logo.pdf, id=91, pagebox=cropbox, 157.58875pt x 63.23625pt>
 File: tud_logo.pdf Graphic file (type pdf)
 <use tud_logo.pdf>
-Package pdftex.def Info: tud_logo.pdf  used on input line 65. on input line 65.
+Package pdftex.def Info: tud_logo.pdf  used on input line 68. on input line 68.
 
 Package pdftex.def Info: Requested size: 134.92238pt x 62.59605pt on input line
- 65.
+ 68.
 
-Overfull \hbox (11.0pt too wide) in paragraph at lines 65--65
+Overfull \hbox (11.0pt too wide) in paragraph at lines 68--68
 [][]  
  []
 
 
-Overfull \hbox (11.0pt too wide) in paragraph at lines 65--65
+Overfull \hbox (11.0pt too wide) in paragraph at lines 68--68
 [][][]  
  []
 
 
-Overfull \hbox (11.0pt too wide) in paragraph at lines 65--65
+Overfull \hbox (11.0pt too wide) in paragraph at lines 68--68
 [][]  
  []
 
 
-Overfull \hbox (11.0pt too wide) in paragraph at lines 65--65
+Overfull \hbox (11.0pt too wide) in paragraph at lines 68--68
 [][][]  
  []
 
 File: tud_logo.pdf Graphic file (type pdf)
 <use tud_logo.pdf>
-Package pdftex.def Info: tud_logo.pdf  used on input line 65. on input line 65.
+Package pdftex.def Info: tud_logo.pdf  used on input line 68. on input line 68.
 
 Package pdftex.def Info: Requested size: 134.92238pt x 62.59605pt on input line
- 65.
-<images/logo.pdf, id=66, pagebox=cropbox, 137.51375pt x 99.37125pt>
+ 68.
+<images/logo.pdf, id=94, pagebox=cropbox, 137.51375pt x 99.37125pt>
 File: images/logo.pdf Graphic file (type pdf)
 <use images/logo.pdf>
-Package pdftex.def Info: images/logo.pdf  used on input line 65. on input line 
-65.
+Package pdftex.def Info: images/logo.pdf  used on input line 68. on input line 
+68.
 Package pdftex.def Info: Requested size: 89.94824pt x 65.00145pt on input line 
-65.
+68.
 
-Overfull \hbox (11.0pt too wide) in paragraph at lines 65--65
+Overfull \hbox (11.0pt too wide) in paragraph at lines 68--68
 [][]  
  []
 
@@ -1537,10 +1588,22 @@ Non-PDF special ignored!
 Non-PDF special ignored!{/home/juliankaeuser/.texlive/texmf-var/fonts/map/pdfte
 x/updmap/pdftex.map} </home/juliankaeuser/texmf/tex/latex/latex-tuddesign_1.0.2
 0140928/texmf/tex/latex/tuddesign/logo/tud_logo.pdf> <./images/logo.pdf>]
+Package tocbasic Info: character protrusion at toc deactivated on input line 78
+.
+
+(./report.toc)
+\tf@toc=\write5
+\openout5 = `report.toc'.
+
+ [1
+
+
+
+
+]
 \openout2 = `introduction.aux'.
 
-
-(./introduction.tex
+ (./introduction.tex
 chapter 1.
 
 Class scrreprt Warning: \float@addtolists detected!
@@ -1567,10 +1630,7 @@ Underfull \hbox (badness 10000) in paragraph at lines 16--20
 
  []
 
-) [1
-
-
-
+) [2
 
 
 ]
@@ -1598,61 +1658,62 @@ up above has ended a previous alignment prematurely,
 you're probably due for more error messages, and you
 might try typing `S' now just to see what is salvageable.
 
-LaTeX Font Info:    Font shape `OT1/mdbch/m/n' will be
-(Font)              scaled to size 9.21606pt on input line 39.
-LaTeX Font Info:    Font shape `OT1/mdbch/m/n' will be
-(Font)              scaled to size 6.43204pt on input line 39.
-LaTeX Font Info:    Font shape `OT1/mdbch/m/n' will be
-(Font)              scaled to size 5.56804pt on input line 39.
-LaTeX Font Info:    Font shape `OML/mdbch/m/it' will be
-(Font)              scaled to size 9.21606pt on input line 39.
-LaTeX Font Info:    Font shape `OML/mdbch/m/it' will be
-(Font)              scaled to size 6.43204pt on input line 39.
-LaTeX Font Info:    Font shape `OML/mdbch/m/it' will be
-(Font)              scaled to size 5.56804pt on input line 39.
-LaTeX Font Info:    Font shape `OMS/mdbch/m/n' will be
-(Font)              scaled to size 9.21606pt on input line 39.
-LaTeX Font Info:    Font shape `OMS/mdbch/m/n' will be
-(Font)              scaled to size 6.43204pt on input line 39.
-LaTeX Font Info:    Font shape `OMS/mdbch/m/n' will be
-(Font)              scaled to size 5.56804pt on input line 39.
-LaTeX Font Info:    Font shape `OMX/mdbch/m/n' will be
-(Font)              scaled to size 9.21606pt on input line 39.
-LaTeX Font Info:    Font shape `OMX/mdbch/m/n' will be
-(Font)              scaled to size 6.43204pt on input line 39.
-LaTeX Font Info:    Font shape `OMX/mdbch/m/n' will be
-(Font)              scaled to size 5.56804pt on input line 39.
-LaTeX Font Info:    Font shape `OML/mdbch/m/n' will be
-(Font)              scaled to size 9.21606pt on input line 39.
-LaTeX Font Info:    Font shape `OML/mdbch/m/n' will be
-(Font)              scaled to size 6.43204pt on input line 39.
-LaTeX Font Info:    Font shape `OML/mdbch/m/n' will be
-(Font)              scaled to size 5.56804pt on input line 39.
-LaTeX Font Info:    Font shape `MDA/mdbch/m/n' will be
-(Font)              scaled to size 9.21606pt on input line 39.
-LaTeX Font Info:    Font shape `MDA/mdbch/m/n' will be
-(Font)              scaled to size 6.43204pt on input line 39.
-LaTeX Font Info:    Font shape `MDA/mdbch/m/n' will be
-(Font)              scaled to size 5.56804pt on input line 39.
-LaTeX Font Info:    Font shape `MDB/mdbch/m/n' will be
-(Font)              scaled to size 9.21606pt on input line 39.
-LaTeX Font Info:    Font shape `MDB/mdbch/m/n' will be
-(Font)              scaled to size 6.43204pt on input line 39.
-LaTeX Font Info:    Font shape `MDB/mdbch/m/n' will be
-(Font)              scaled to size 5.56804pt on input line 39.
-LaTeX Font Info:    Font shape `OML/mdput/m/it' will be
-(Font)              scaled to size 9.02402pt on input line 39.
-LaTeX Font Info:    Font shape `OML/mdput/m/it' will be
-(Font)              scaled to size 6.298pt on input line 39.
-LaTeX Font Info:    Font shape `OML/mdput/m/it' will be
-(Font)              scaled to size 5.45201pt on input line 39.
-[2
+[3
 
 
 
 ]
-./math.tex:44: Misplaced alignment tab character &.
-l.44     a(n) \circledast b(n) &
+LaTeX Font Info:    Font shape `OT1/mdbch/m/n' will be
+(Font)              scaled to size 9.21606pt on input line 41.
+LaTeX Font Info:    Font shape `OT1/mdbch/m/n' will be
+(Font)              scaled to size 6.43204pt on input line 41.
+LaTeX Font Info:    Font shape `OT1/mdbch/m/n' will be
+(Font)              scaled to size 5.56804pt on input line 41.
+LaTeX Font Info:    Font shape `OML/mdbch/m/it' will be
+(Font)              scaled to size 9.21606pt on input line 41.
+LaTeX Font Info:    Font shape `OML/mdbch/m/it' will be
+(Font)              scaled to size 6.43204pt on input line 41.
+LaTeX Font Info:    Font shape `OML/mdbch/m/it' will be
+(Font)              scaled to size 5.56804pt on input line 41.
+LaTeX Font Info:    Font shape `OMS/mdbch/m/n' will be
+(Font)              scaled to size 9.21606pt on input line 41.
+LaTeX Font Info:    Font shape `OMS/mdbch/m/n' will be
+(Font)              scaled to size 6.43204pt on input line 41.
+LaTeX Font Info:    Font shape `OMS/mdbch/m/n' will be
+(Font)              scaled to size 5.56804pt on input line 41.
+LaTeX Font Info:    Font shape `OMX/mdbch/m/n' will be
+(Font)              scaled to size 9.21606pt on input line 41.
+LaTeX Font Info:    Font shape `OMX/mdbch/m/n' will be
+(Font)              scaled to size 6.43204pt on input line 41.
+LaTeX Font Info:    Font shape `OMX/mdbch/m/n' will be
+(Font)              scaled to size 5.56804pt on input line 41.
+LaTeX Font Info:    Font shape `OML/mdbch/m/n' will be
+(Font)              scaled to size 9.21606pt on input line 41.
+LaTeX Font Info:    Font shape `OML/mdbch/m/n' will be
+(Font)              scaled to size 6.43204pt on input line 41.
+LaTeX Font Info:    Font shape `OML/mdbch/m/n' will be
+(Font)              scaled to size 5.56804pt on input line 41.
+LaTeX Font Info:    Font shape `MDA/mdbch/m/n' will be
+(Font)              scaled to size 9.21606pt on input line 41.
+LaTeX Font Info:    Font shape `MDA/mdbch/m/n' will be
+(Font)              scaled to size 6.43204pt on input line 41.
+LaTeX Font Info:    Font shape `MDA/mdbch/m/n' will be
+(Font)              scaled to size 5.56804pt on input line 41.
+LaTeX Font Info:    Font shape `MDB/mdbch/m/n' will be
+(Font)              scaled to size 9.21606pt on input line 41.
+LaTeX Font Info:    Font shape `MDB/mdbch/m/n' will be
+(Font)              scaled to size 6.43204pt on input line 41.
+LaTeX Font Info:    Font shape `MDB/mdbch/m/n' will be
+(Font)              scaled to size 5.56804pt on input line 41.
+LaTeX Font Info:    Font shape `OML/mdput/m/it' will be
+(Font)              scaled to size 9.02402pt on input line 41.
+LaTeX Font Info:    Font shape `OML/mdput/m/it' will be
+(Font)              scaled to size 6.298pt on input line 41.
+LaTeX Font Info:    Font shape `OML/mdput/m/it' will be
+(Font)              scaled to size 5.45201pt on input line 41.
+
+./math.tex:48: Misplaced alignment tab character &.
+l.48     a(n) \circledast b(n) &
                                 = \sum_{k=0}^{N-1}a(k)\cdot b((n-k)\; mod\; ...
 I can't figure out why you would want to use a tab mark
 here. If you just want an ampersand, the remedy is
@@ -1661,8 +1722,8 @@ up above has ended a previous alignment prematurely,
 you're probably due for more error messages, and you
 might try typing `S' now just to see what is salvageable.
 
-./math.tex:51: Misplaced alignment tab character &.
-l.51     a'(n) &
+./math.tex:55: Misplaced alignment tab character &.
+l.55     a'(n) &
                 = \begin{cases}
 I can't figure out why you would want to use a tab mark
 here. If you just want an ampersand, the remedy is
@@ -1671,8 +1732,8 @@ up above has ended a previous alignment prematurely,
 you're probably due for more error messages, and you
 might try typing `S' now just to see what is salvageable.
 
-./math.tex:59: Misplaced alignment tab character &.
-l.59     b'(n) &
+./math.tex:63: Misplaced alignment tab character &.
+l.63     b'(n) &
                 = \begin{cases}
 I can't figure out why you would want to use a tab mark
 here. If you just want an ampersand, the remedy is
@@ -1681,8 +1742,8 @@ up above has ended a previous alignment prematurely,
 you're probably due for more error messages, and you
 might try typing `S' now just to see what is salvageable.
 
-./math.tex:69: Misplaced alignment tab character &.
-l.69     a'(n) \ast b'(n) &
+./math.tex:73: Misplaced alignment tab character &.
+l.73     a'(n) \ast b'(n) &
                            \stackrel{!}{=}  a'(n) \circledast b'(n)
 I can't figure out why you would want to use a tab mark
 here. If you just want an ampersand, the remedy is
@@ -1691,8 +1752,8 @@ up above has ended a previous alignment prematurely,
 you're probably due for more error messages, and you
 might try typing `S' now just to see what is salvageable.
 
-./math.tex:76: Misplaced alignment tab character &.
-l.76     \tilde{y}(n) &
+./math.tex:80: Misplaced alignment tab character &.
+l.80     \tilde{y}(n) &
                        = \sum_{r=-\infty}^{\infty}y(n+rN)
 I can't figure out why you would want to use a tab mark
 here. If you just want an ampersand, the remedy is
@@ -1701,8 +1762,9 @@ up above has ended a previous alignment prematurely,
 you're probably due for more error messages, and you
 might try typing `S' now just to see what is salvageable.
 
-./math.tex:84: Misplaced alignment tab character &.
-l.84     a(n) \circledast b(n) &
+[4]
+./math.tex:88: Misplaced alignment tab character &.
+l.88     a(n) \circledast b(n) &
                                 \stackrel{!}{=} \text{alias}\left(a'(n) \ast...
 I can't figure out why you would want to use a tab mark
 here. If you just want an ampersand, the remedy is
@@ -1711,9 +1773,8 @@ up above has ended a previous alignment prematurely,
 you're probably due for more error messages, and you
 might try typing `S' now just to see what is salvageable.
 
-[3]
-./math.tex:93: Misplaced alignment tab character &.
-l.93     a(n) \circledast b(n) &
+./math.tex:97: Misplaced alignment tab character &.
+l.97     a(n) \circledast b(n) &
                                 = \text{alias}\left(\text{IFFT}\left( \text{...
 I can't figure out why you would want to use a tab mark
 here. If you just want an ampersand, the remedy is
@@ -1722,9 +1783,9 @@ up above has ended a previous alignment prematurely,
 you're probably due for more error messages, and you
 might try typing `S' now just to see what is salvageable.
 
-./math.tex:99: Misplaced alignment tab character &.
-l.99     L_{a'(n)} = L_{b'(n)} &
-                                = \text{min}(2^{k})\geq L_{a(n)}+L_{b(n)}-1,...
+./math.tex:103: Misplaced alignment tab character &.
+l.103     L_{a'(n)} = L_{b'(n)} &
+                                 = \text{min}(2^{k})\geq L_{a(n)}+L_{b(n)}-1...
 I can't figure out why you would want to use a tab mark
 here. If you just want an ampersand, the remedy is
 simple: Just type `I\&' now. But if some right brace
@@ -1732,30 +1793,68 @@ up above has ended a previous alignment prematurely,
 you're probably due for more error messages, and you
 might try typing `S' now just to see what is salvageable.
 
-[4]) [5]
+[5]) [6]
 \openout2 = `code.aux'.
 
  (./code.tex
 chapter 3.
-) [6
+LaTeX Font Info:    Try loading font information for T1+txtt on input line 9.
+(/usr/share/texmf-dist/tex/latex/txfonts/t1txtt.fd
+File: t1txtt.fd 2000/12/15 v3.1
+)
+Package microtype Info: Loading generic protrusion settings for font family
+(microtype)             `txtt' (encoding: T1).
+(microtype)             For optimal results, create family-specific settings.
+(microtype)             See the microtype manual for details.
+
+./code.tex:62: Missing $ inserted.
+<inserted text> 
+                $
+l.62     t
+          otalMaxPower = 0;\\
+I've inserted a begin-math/end-math symbol since I think
+you left one out. Proceed, with fingers crossed.
+
+
+./code.tex:62: LaTeX Error: There's no line here to end.
+
+See the LaTeX manual or LaTeX Companion for explanation.
+Type  H <return>  for immediate help.
+ ...                                              
+                                                  
+l.62     t
+          otalMaxPower = 0;\\
+Your command was ignored.
+Type  I <command> <return>  to replace it with another command,
+or  <return>  to continue without it.
+
+./code.tex:62: Missing $ inserted.
+<inserted text> 
+                $
+l.62     t
+          otalMaxPower = 0;\\
+I've inserted a begin-math/end-math symbol since I think
+you left one out. Proceed, with fingers crossed.
+
+[7
 
 
 
-]
+] [8]) [9]
 \openout2 = `composition.aux'.
 
  (./composition.tex
 chapter 4.
-) [7
+[10
 
 
 
-]
+]) [11]
 \openout2 = `evaluation.aux'.
 
  (./evaluation.tex
 chapter 5.
-) [8
+) [12
 
 
 
@@ -1764,34 +1863,37 @@ chapter 6.
 
 LaTeX Warning: Empty `thebibliography' environment on input line 3.
 
-) [9
+) [13
 
 
 
 ]
-Package atveryend Info: Empty hook `BeforeClearDocument' on input line 91.
-Package atveryend Info: Empty hook `AfterLastShipout' on input line 91.
+Package atveryend Info: Empty hook `BeforeClearDocument' on input line 99.
+Package atveryend Info: Empty hook `AfterLastShipout' on input line 99.
  (./report.aux (./introduction.aux) (./math.aux) (./code.aux)
 (./composition.aux) (./evaluation.aux))
-Package atveryend Info: Executing hook `AtVeryEndDocument' on input line 91.
-Package atveryend Info: Executing hook `AtEndAfterFileList' on input line 91.
+Package atveryend Info: Executing hook `AtVeryEndDocument' on input line 99.
+Package atveryend Info: Executing hook `AtEndAfterFileList' on input line 99.
 Package rerunfilecheck Info: File `report.out' has not changed.
-(rerunfilecheck)             Checksum: B952424FBFAE510678A9BB9CF960D4FF;952.
+(rerunfilecheck)             Checksum: 3EE471E6F23F1F8276BE5226A3AD63EF;1455.
 
 
 LaTeX Font Warning: Size substitutions with differences
 (Font)              up to 0.5pt have occurred.
 
-Package atveryend Info: Empty hook `AtVeryVeryEnd' on input line 91.
+
+LaTeX Warning: Label(s) may have changed. Rerun to get cross-references right.
+
+Package atveryend Info: Empty hook `AtVeryVeryEnd' on input line 99.
  ) 
 Here is how much of TeX's memory you used:
- 25165 strings out of 492985
- 475597 string characters out of 6138637
- 656791 words of memory out of 5000000
- 27995 multiletter control sequences out of 15000+600000
- 106109 words of font info for 182 fonts, out of 8000000 for 9000
+ 26280 strings out of 492985
+ 493606 string characters out of 6138637
+ 687926 words of memory out of 5000000
+ 29030 multiletter control sequences out of 15000+600000
+ 125818 words of font info for 208 fonts, out of 8000000 for 9000
  1141 hyphenation exceptions out of 8191
- 59i,13n,100p,8945b,489s stack positions out of 5000i,500n,10000p,200000b,80000s
+ 59i,17n,100p,8945b,492s stack positions out of 5000i,500n,10000p,200000b,80000s
 {/usr/share/texmf-dist/fonts/enc/dvips/ly1/texnansi.enc}{/usr/share/texmf-dis
 t/fonts/enc/dvips/base/8r.enc}</usr/share/texmf/fonts/type1/softmake/charter/5c
 hb8a.pfb></usr/share/texmf/fonts/type1/softmake/charter/5chr8a.pfb></usr/share/
@@ -1804,11 +1906,12 @@ hare/texmf-dist/fonts/type1/bitstrea/charter/bchri8a.pfb></usr/share/texmf-dist
 public/mathdesign/mdbch/md-chr7v.pfb></usr/share/texmf-dist/fonts/type1/public/
 mathdesign/mdbch/md-chr7y.pfb></usr/share/texmf-dist/fonts/type1/public/mathdes
 ign/mdbch/md-chri7m.pfb></usr/share/texmf-dist/fonts/type1/public/mathdesign/md
-bch/md-chrma.pfb></usr/share/texmf-dist/fonts/type1/public/rsfs/rsfs10.pfb>
-Output written on report.pdf (10 pages, 152185 bytes).
+bch/md-chrma.pfb></usr/share/texmf-dist/fonts/type1/public/rsfs/rsfs10.pfb></us
+r/share/texmf-dist/fonts/type1/public/txfonts/t1xtt.pfb>
+Output written on report.pdf (14 pages, 177504 bytes).
 PDF statistics:
- 228 PDF objects out of 1000 (max. 8388607)
- 192 compressed objects within 2 object streams
- 44 named destinations out of 1000 (max. 500000)
- 24729 words of extra memory for PDF output out of 24883 (max. 10000000)
+ 318 PDF objects out of 1000 (max. 8388607)
+ 276 compressed objects within 3 object streams
+ 68 named destinations out of 1000 (max. 500000)
+ 26321 words of extra memory for PDF output out of 29859 (max. 10000000)
 

@@ -49,6 +49,8 @@
 \renewcommand\plparsep{1ex}
 \usepackage{enumerate}
 
+\usepackage{algorithm2e}
+
 
 \title{\textbf{Optimization of a GPS Acquisition Algorithm for an AMIDAR Processor}}
 \subtitle{Lab Report by Fallou Galass Coly and Julian K\"auser}
@@ -58,6 +60,7 @@
 \setinstitutionlogo{images/logo.pdf}
 % \institution{Institut f\"ur Datentechnik\hfill\textbar\hfill Fachgebiet Rechnersysteme\hfill\textbar\hfill Prof.\,Dr.-Ing.\, Hans Eveking}
 %\settitlepicture{images/spartan}
+
 \begin{document}
 
 %% Titel %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -72,6 +75,7 @@
 %% Hauptteil %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \pagestyle{headings}
 \pagenumbering{arabic}
+\tableofcontents
 
 \include{introduction}
 \include{math}
@@ -81,11 +85,15 @@
 
 
 %% Anhang %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%\appendix
+
 \bibliographystyle{plain}
 \clearpage
 % \nocite{*}
 \bibliography{literaturverzeichnis}
+%\appendix
+%\chapter{Schedules}
+%\chapter{AMIDAR Configuration}
+%\chapter{CGRA Composition}
 
 
 \end{document}

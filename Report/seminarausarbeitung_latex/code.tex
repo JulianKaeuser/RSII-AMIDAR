@@ -1,3 +1,114 @@
 \chapter{Code Style Optimizations}
 \label{cha:codeOptimization}
 
+In this chapter, certain aspects on the way the solution is implemented in Java are presented. 
+
+\section{General Code Structure}
+\label{sec:generalCodeStructure}
+
+The class \texttt{Acquisition}, as given by the framework, is once instantiated and performs all computations. The samples and codes are entered by calls to the methods \texttt{enterSample} and \texttt{enterCode}.
+
+\subsubsection{Static Assignments}
+\label{subsubsec:staticAssignments}
+
+Constants such as $\pi$, $2\pi$, $-\pi$, $-2\pi$ or precomputed ratios of the sampling rate are defined as \texttt{final static} fields of the class. The values are explicitly written out because the Java compiler is not as powerful as other compilers. As we were not sure how far the Java 1.4 compilation standard works, this was a safety decision.
+
+\subsubsection{Constructor}
+\label{subsubsec:constructor}
+
+The constructor is called with the number of samples as argument. At that time, the decision between a Radix-2 and -4 FFT is made. Arrays for the samples and codes of a length $N'$, as depicted in chapter \ref{cha:mathematicalOptimizations}, are allocated. 
+
+\subsubsection{Entering Samples}
+\label{subsubsec:enterSamples}
+Each sample's real and imaginary part is inserted at the current sample index in the samples' real and imaginary array. Then, the index is incremented by 1. Additionally, a global variable holding the total signal power is incremented by the sum of squares of the input sample. It is required later for the acquisition.
+
+\subsubsection{Entering Codes}
+\label{subsubsec:enterCodes}
+The codes have to be inserted in descending order into their respective arrays, since the relation between the correlation and circular convolution is $\text{samples}(n) \star \text{codes}(n) = \text{samples}(n) \circledast \text{codes}(-n)$. Therefore, the index to insert starts at \texttt{nrOfSamples}$-1$ and is decremented by 1 at the end of the method. 
+All higher indices than \texttt{nrOfSamples} are never written and implicitly zero.
+
+\subsection{Acquisition Kernel}
+\label{subsec:startAcquisition}
+The kernel of the acquisition is started by a call of \texttt{startAcquisition}, which returns the acquisition result as boolean.
+
+Algorithm \ref{alg:kernel} describes the computation for each of the 11 target frequencies. The call of a DIF-FFT for the codes, before the first loop, is actually implemented as method call; all other occurrences of FFTs are inserted at this place, because the CGRA cannot perform method calls.
+
+\begin{algorithm}
+    \KwData{codes = cReal, cImag; samples}
+    radix = power of 2 even ? 4 : 2;\\
+    cReal, cImag = DIF-FFT(radix, codes);\\
+    \ForEach{frequency $f_{d}\in$ targetFrequencies}{
+        sReal, sImag = new arrays of length N'\\
+        \For{n = 0; n<nrOfSamples; n++}{
+            sReal, sImag = multiply(samples(n), e^{-2\pi f_{step}/f_{s}  -2\pi minRate/f_{s}});\\
+        }
+        sReal, sImag = DIF-FFT(radix, sReal, sImag);\\
+        \For{n = 0; n<N'; n++}{
+            sReal(n), sImag(n) = multiply(sReal(n), sImag(n), codes(n));\\
+            sImag = -1 $\cdot$  sImag;
+        }
+        sReal, sImag = DIT-FFT(radix, sReal, sImag);\\
+        maxPower($f_{d}$) = 0;\\
+        maxIndex($f_{d}$) = 0;\\
+        \ForEach{n = 0; n<nrOfSamples; n++}{
+            sReal(n) = sReal(n+N')/N';\\
+            sImag(n) = sImag(n+N')/N';\\
+            \If{sReal(n)$^{2}$+sImag(n)$^{2}$ $\geq$ maxPower($f_{d}$)}{
+                maxPower($f_{d}$) = (sReal(n)$^{2}$+sImag(n)$^{2}$);\\
+                maxIndex($f_{d}$) = n;\\
+            }
+        }
+    }
+    totalMaxPower = 0;\\
+    dopplerShift = 0;\\
+    codeShift = 0;\\
+    \ForEach{frequency $f_{d}\in$ targetFrequencies}{
+        \If{maxPower($f_{d}$) $\geq$ totalMaxPower}{
+            maxTotalPower = maxPower($f_{d}$);\\
+            dopplerShift = $f_{d}$;\\
+            codeShift = maxIndex($f_{d}$);\\
+        }
+    }
+    acquisition = totalMaxPower $\geq$ totalPower $\cdot$  0.015;\\
+    \KwRet{acquisition}\\
+
+    \label{alg:kernel}
+    \caption{The kernel of the acquisition.}
+\end{algorithm}
+
+Although the CGRA would have been capable of performing even the outermost loop, the synthesis produced an error, so that this loop was not accelerated. This is the reason why we decided to allocate a new array for the samples \emph{inside} the outermost loop - it is not possible to be accelerated anyway, and by this allocation, we made use of the zero-initialization of simple data type arrays in Java. Like this, $2N'-2\cdot$nrOfSamples assignments with zero, which would have been necessary in each iteration, could be avoided.
+
+\subsection{FFT Implementations}
+\label{subsec:fftImplementations}
+
+All four types of FFT have been developed by rapid prototyping in octave, which is easier to find errors and eases the handling with complex numbers. Moreover, the octave function \texttt{fft} provides a easy accessible reference output. 
+
+Common to all four types of FFT is that they consist of three nested loops. The outermost loop is the level of recursion and is executed $\log{}N'$ times. Within the second loop, blocks of values which have to be computed equally are iterated; the innermost loop holds the computation of the so-called \emph{twiddle factors}, reverses the order of the values from the block, multiplies the values with the twiddle factors and re-assigns them to the memory. In the Radix-4 immplementations, four values are handled in the innermost loop at once. The Radix-2 FFTs only handle 2 values at once.
+
+\subsection{Complex Algebra}
+\label{subsec:ComplexAlgebra}
+
+In general, all FFT operations have to be performed as complex-valued. This can be either done in the polar or cartesian representation. Since most of the steps include additions and multiplication, it is easier to perform all oeprations in the cartesian representation. That way, no conversions, which involve square roots and trigonometric functions, are required; a multiplication in the cartesian form is less difficult with four floating point multiplications and two additions.
+
+\section{Other Coding Remarks}
+\label{sec:codeOther}
+
+\subsubsection{Debugging}
+\label{subsubsec:debugging}
+
+No debugging was done in the AMIDAR simulator; functional debugging has only been performed by running the \texttt{AcquisitionTest} main method in Eclipse and using the native Eclipse debugger. As stated before, mathematical optimizations have been prototyped in octave.
+
+\subsubsection{Object-Oriented Programming}
+\label{subsubsec:oop}
+
+Whereever it is possible, no objects are used. There is no need for object-oriented programming, since the complexity of this task is manageable with only simple data types. Nevertheless, the use of objects would have resulted in a less messy code, which was not among the optimization goals.
+
+\subsubsection{Performance and Energy}
+\label{subsubsec:codePerformanceAndEnergy}
+
+In the code, no differentiation between performance-optimized and energy-optimized variants has been made. Both proposed solutions use the same code.
+
+
+
+
+

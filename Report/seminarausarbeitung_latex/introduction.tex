@@ -3,14 +3,14 @@
 
 In this lab, our task was to find an optimized combination of mathematical modification, code and hardware configuration
 of a GPS signal acquisition algorithm for the RS AMIDAR processor. The quality of the solution is measured in two metrics:
-required ticks for the computation in the AMIDAR simulato, further called \emph{performance optimization} and consumed energy
+required ticks for the computation in the AMIDAR simulator, further called \emph{performance optimization}, and consumed energy
 as measured by the simulator. For both goals, dedicated solutions in all aspects are allowed, but not required. All code must be
-written in Java 1.4 in order to obatin the compatibility with the current AMIDAR toolchain.
+written in Java 1.4 in order to obtain the compatibility with the current AMIDAR toolchain.
 
 Our presented solutions include optimizations in the following fields:
 \begin{enumerate}
     \item \textbf{Mathematical Conversions} \\ 
-    The algorithm represents a cross convolution between a vector of LA-1 codes and the samples of the GPS receiver. Any mathematical 
+    The algorithm represents a cross convolution between a vector of L1 codes and the samples of the GPS receiver. Any mathematical 
     conversion which yields the same results can be applied. The ability to map the applied conversions efficiently in code and onto the hardware
     may be an aspect to watch while applying these conversions.\\
     \item \textbf{Code Style Optimizations}\\
@@ -23,11 +23,3 @@ Our presented solutions include optimizations in the following fields:
 \end{enumerate}
 
 In this report, an overview of our solutions in the presented fields is given in the particular order. The report closes with an evaluation of the results.
-
-\section{Original Algorithm}
-\label{sec:originalAlgorithm}
-
-The subject of all optimizations is the following algorithm, which presents the extraction of a peak in the cross correlation between a sampled signal and a vector of 
-LA-1 codes. The cross correlation is presented as the circular convolution of the inversed code vector with the sample vector, which can be converted to a DFT/IDFT pair:
-
-eqns here

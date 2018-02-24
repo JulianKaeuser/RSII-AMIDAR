@@ -1,10 +1,49 @@
 \chapter{Composition Optimization}
 \label{cha:compositionOptimization}
 
+The last field in which changes are allowed in order to enhance the solution quality is the hardware configuration of the AMIDAR processor.
+Our approach towards these optimization mainly targeted the utilized CGRA, which is highly adaptable. The proposed solutions only differ in the utilized CGRA composition.
+
+In the following, the approaches for both targets are described.
+
 \section{Performance Adaption of CGRA Compositions}
 \label{sec:performanceComposition}
+As an obvious first approach, the largest available composition, homogenously operator-equipped and with 16 PEs, is chosen. Since irregularly connected and inhomogneously equipped compositions can yield a significant acceleration (mostly due to characteristics of the used scheduler), we targeted more different compositions.
+
+Finding a good composition in terms of the speedup can be done in different ways. Manual optimizations are time-inefficient and often do not yield much gain. Optimal solutions, defined by algorithms, are not targetable, due to the huge number of combinations. Heuristics either need a lot of knowledge of the problem or require a lot of time to tailor the heuristics to the implementation details. Metaheuristics are often easier to use. In our case, we used a very simple kind of Simulated Annealing, which only differed slightly from a random search of compositions.
+
+\subsection{Simulated Annealing}
+\label{subsec:SA}
+
+Simulated Annealing is a well-known metaheuristic which is able to optimize a configuration by the use of a cost function and a mutation function. The cost function takes a configuration and computes the quality of it, depending on the optimization goal. The mutation function takes a configuration, changes some parameters randomly, and returns the altered configuration. Within two loops, the main algorithm of Simulated Annealing continously generates new configurations with the mutation function, and evaluates the quality. If the quality is better than the previous configuration, the new configuration is always accepted as new optimum. If it is not better, the configuration is only accepted with a probability, which depends on the number of iterations and acceptance.
+
+The Simulated Annealing used here is not thoroughly parametrized. Only the reference implementation (taken from the High Level Synthesis lecture) is used. This evaluates to ca. 8,000 to 10,000 iterations in total. This choice was made due to the lack of time and because even the first tests showed great improvements with this approach.
+
+As a cost function, a schedule produced by the AMIDAR list scheduler is used. It is computed for the currently examined composition; the shorter the schedule and especially the innermost loop, which is most often executed, the better is the composition quality, and the smaller is the cost. Criteria like size of the CGRA and reachable clock frequency are not targeted, because they do not contribute to the optimization goal (although this must be done in practice!).
+
+The mutation function applies changes in two criteria: Processing elements (PEs) are added or deleted, and connections between them are added or removed. This is done up to a maximum size of 16 PEs and a minimum size of three PEs. In any case, the maximum number of memory access PEs is secured by adding as many memory operators as have been removed to the remaining PEs. No more changes are applied to the set of available operations in the PEs, because other kernels in the test environment rely on some operations, which makes the outcome of the Simulated Annealing unpredictable in its overall quality. Therefore, not all potential gain of the Simulated Annealing can be achieved.
+
+\subsection{Encountered Problems}
+\label{subsec:problemsSA}
+
+While the scheduling results for the found compositions by the Simulated Annealing approach promised good solutions, we encountered some problems which are not easy to fix.
+
+First of all, the quality of a composition could only be found for one synthesized method. No combination of kernels could be examined, since the framework only gave access to one CDFG object at a time. Serialising the kernel data for the scheduler was not possible due to inconsistencies in the JSON I/O parts of the framework. 
+
+This problem not only led to \"false positive\" quality compositions. Other kernels, which are part of the test environment for the \texttt{Acquisition} class, are also typically executed on the CGRA. These kernels could not be included in the cost evaluation of the composition and could possibly slow down the execution massively. 
+
+For unknown reasons, compositions which were not reported as invalid and which did not cause logs about unsynthesizable kernels created non-terminating behaviour of the simulator. While, on the test system, typically a full simulation finished after maximum two minutes, no termination of the program happened even after two hours. The bug could not be resolved.
+
+\subsection{Final Composition}
+\label{subsec:finalCompositionPerformance}
+Due to the encountered problems with the Metaheuristics composition optimization approach, the best found solution which actually worked remained the standard homogenous 16-PE composition. There was too less time and too many problems to solve to optimize the composition in a reasonable way, although the schedule length improvements by the Simulated Annealing showed around 30\% shorter schedules (for the innermost loop) even after short runtimes.
+
 
 \section{Energy-Consumption Optimizations of CGRA Compositions}
 \label{sec:energyComposition}
+
+In order to find a good CGRA composition in terms of the total energy consumption, a compromise between the composition size (number of PEs and operators within the PEs) and the overall runtime must be found, i.e. the product of runtime and energy consumption by the circuit must be minimized.
+
+For the best results regarding the energy consumption, a CGRA with four PEs, one of them with memory access, has been used. To our surprise, the runtime did not extend more than 1 million cycles over the performance-optimized composition in the most cases; Still, the energy consumed by the CGRA is significantly lower than with larger compositions. The choice of the small composition did hence result in a not much slower, but more energy efficient system.
 
 
